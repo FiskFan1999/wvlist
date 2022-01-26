@@ -40,6 +40,9 @@ func main() {
 	pmux.HandleFunc("/", HomePage)
 	tmux.HandleFunc("/", HomePage)
 
+	pmux.HandleFunc("/view/", ViewPage)
+	tmux.HandleFunc("/view/", ViewPage)
+
 	// run plain and tls listeners concurrently
 	wg := new(sync.WaitGroup)
 	wg.Add(1)

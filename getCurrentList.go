@@ -112,6 +112,29 @@ func ParseCurrentSingle(id string) (*CurrentSingle, error) {
 
 	ComposerInfo.WVList = AllWVEntries
 
+	/*
+		Parse csv notes (written by the contributors)
+	*/
+
+	var CSVNotesList [][]string
+	CSVNotesList, err = csv.NewReader(bytes.NewReader(fileNotes)).ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	var allNotes []Note
+
+	for _, row := range CSVNotesList {
+		var n Note
+		n.Author = row[0]
+		n.DateSTR = row[1]
+		n.Message = row[2]
+
+		allNotes = append(allNotes, n)
+	}
+
+	ComposerInfo.Notes = allNotes
+
 	fmt.Println(fileNotes, ComposerInfo)
 
 	return &ComposerInfo, nil
