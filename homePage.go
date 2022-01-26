@@ -11,11 +11,10 @@ type HomePagePar struct {
 func HomePage(w http.ResponseWriter, r *http.Request) {
 
 	/*
-		Check if the path is not equal to "/"
-		(The request is for a page we don't have)
+		If path is not equal to /, treat it as calling a root static file
 	*/
 	if r.URL.Path != "/" {
-		http.Error(w, "Page Not Found", 404)
+		GetRootStaticFile(w, r)
 		return
 	}
 

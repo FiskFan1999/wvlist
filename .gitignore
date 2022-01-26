@@ -8,3 +8,5 @@
 !config.txt
 !template
 !template/*
+!rootstatic
+!rootstatic/style.css
