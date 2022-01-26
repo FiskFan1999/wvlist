@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
+	"strconv"
+	"sync"
 )
 
 func main() {
@@ -10,8 +13,8 @@ func main() {
 
 	Params = new(ParamsStr)
 
-	flag.UintVar(&Params.PlaintextPort, "p", 6060, "Plaintext port, set to 0 to disable.")
-	flag.UintVar(&Params.TLSPort, "t", 0, "TLS port, set to 0 to disable.")
+	flag.Uint64Var(&Params.PlaintextPort, "p", 6060, "Plaintext port, set to 0 to disable.")
+	flag.Uint64Var(&Params.TLSPort, "t", 0, "TLS port, set to 0 to disable.")
 	flag.BoolVar(&Params.DebugModeTLS, "d", false, "Debug mode: listens to TLS port over plaintext. Should not use in prod.")
 	flag.StringVar(&Params.FullCert, "k", "", "Key, path to fullchain.pem")
 	flag.StringVar(&Params.PrivCert, "x", "", "Secret, path to privkey.pem")
@@ -25,4 +28,39 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(FullConfig)
+
+	/*
+		Create seperate plaintext and TLS muxers
+		(plaintext mux will disable operator
+		console)
+	*/
+	pmux := http.NewServeMux()
+	tmux := http.NewServeMux()
+
+	pmux.HandleFunc("/", HomePage)
+	tmux.HandleFunc("/", HomePage)
+
+	// run plain and tls listeners concurrently
+	wg := new(sync.WaitGroup)
+	wg.Add(1)
+	if Params.PlaintextPort != 0 {
+		wg.Add(1)
+		go func() {
+			http.ListenAndServe(":"+strconv.FormatUint(Params.PlaintextPort, 10), pmux)
+			wg.Done()
+		}()
+	}
+	if Params.TLSPort != 0 {
+		wg.Add(1)
+		go func() {
+			if Params.DebugModeTLS {
+				http.ListenAndServe(":"+strconv.FormatUint(Params.TLSPort, 10), tmux)
+			} else {
+				http.ListenAndServeTLS(":"+strconv.FormatUint(Params.TLSPort, 10), Params.FullCert, Params.PrivCert, tmux)
+			}
+			wg.Done()
+		}()
+	}
+	wg.Done()
+	wg.Wait()
 }
