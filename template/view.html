@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div>
+            <h1>{{ .ComposerFirst }} {{.ComposerLast}} ({{ .ComposerBirth}}-{{if ne .ComposerDeath 0}}{{.ComposerDeath}}{{end}})</h1>
+            {{ range .Notes }}
+            <p>{{.Message}}</p>
+            <p style="text-align:right;"><i>- {{.Author}}, {{.DateSTR}}</i></p>
+            {{ end }}
+            <table>
+                <tr>
+                    <th>
+                        Class.
+                    </th>
+                    <th>
+                        No.
+                    </th>
+                    <th>
+                        Other
+                    </th>
+                    <th>
+                        Title
+                    </th>
+                    <th>
+                        Incipit
+                    </th>
+                </tr>
+                {{ range .WVList }}
+                <tr>
+                    <td>{{.Classifier}}</td>
+                    <td>{{.Number}}</td>
+                    <td>{{.Extra}}</td>
+                    <td>{{.Title}}</td>
+                    <td><img src="/incipit/{{.IncipitHTML}}" alt="{{.Incipit}}"></td>
+                </tr>
+                {{ end }}
+            </table>
+        </div>
+    </body>
+</html>
