@@ -18,13 +18,10 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/*
+	fullList := GetAllLists()
 
-		WVEntry, _ := ParseCurrentSingle("bach")
-		for _, row := range WVEntry.WVList {
-			fmt.Fprintln(w, row)
-		}
-	*/
+	var inp HomePageTemplateInput
+	inp.List = fullList
 
 	homeTemplatePath := "./template/homepage.html"
 	tmp, err := template.ParseFiles(homeTemplatePath)
@@ -32,5 +29,5 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", 500)
 		return
 	}
-	tmp.Execute(w, nil)
+	tmp.Execute(w, inp)
 }

@@ -7,6 +7,11 @@
     <body>
         <div>
             <h1>This is the home page.</h1>
+            <ul>
+                {{ range .List }}
+                <li><a href="/view/{{.Path}}">{{.Name}}</a></li>
+                {{ end }}
+            </ul>
         </div>
     </body>
 </html>
