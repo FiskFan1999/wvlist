@@ -1,0 +1,5 @@
+\version "{{ .LilypondVersion }}"
+\include "lilypond-book-preamble.ly"
+\score { { \omit Staff.TimeSignature
+{{ .Score }}
+}}

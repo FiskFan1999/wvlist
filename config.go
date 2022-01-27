@@ -7,7 +7,8 @@ import (
 )
 
 type ConfigStr struct {
-	Name string `json:"name"`
+	Name            string `json:"name"`
+	LilypondVersion string `json:"lilypond_version"`
 }
 
 var FullConfig *ConfigStr

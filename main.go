@@ -43,6 +43,9 @@ func main() {
 	pmux.HandleFunc("/view/", ViewPage)
 	tmux.HandleFunc("/view/", ViewPage)
 
+	pmux.HandleFunc("/incipit/", GetLilypond)
+	tmux.HandleFunc("/incipit/", GetLilypond)
+
 	// run plain and tls listeners concurrently
 	wg := new(sync.WaitGroup)
 	wg.Add(1)

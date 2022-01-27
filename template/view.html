@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="/style.css">
     </head>
     <body>
         <div>
-            <h1>{{ .ComposerFirst }} {{.ComposerLast}} ({{ .ComposerBirth}}-{{if ne .ComposerDeath 0}}{{.ComposerDeath}}{{end}})</h1>
+            <h1 style="margin-top:0;">{{ .ComposerFirst }} {{.ComposerLast}} ({{ .ComposerBirth}}-{{if ne .ComposerDeath 0}}{{.ComposerDeath}}{{end}})</h1>
+            <div style="border:solid black 0;max-width:25em;margin:0px;">
             {{ range .Notes }}
             <p>{{.Message}}</p>
-            <p style="text-align:right;"><i>- {{.Author}}, {{.DateSTR}}</i></p>
+            <p style="text-align:right;"><i>- {{.Author}}<br>{{.DateSTR}}</i></p>
             {{ end }}
+            </div>
             <table>
                 <tr>
                     <th>
@@ -34,7 +37,7 @@
                     <td style="text-align:right;">{{.Number}}</td>
                     <td>{{.Extra}}</td>
                     <td>{{.Title}}</td>
-                    <td>{{if .Incipit }}<img src="/incipit/{{.IncipitHTML}}" alt="{{.Incipit}}">{{ end}}</td>
+                    <td>{{if .Incipit }}<img src="/incipit?f={{.IncipitHTML}}.png" alt="{{.Incipit}}">{{ end}}</td>
                 </tr>
                 {{ end }}
             </table>

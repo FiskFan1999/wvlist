@@ -10,3 +10,4 @@
 !template/*
 !rootstatic
 !rootstatic/style.css
+!lilypond_template
