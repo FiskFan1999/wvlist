@@ -21,7 +21,7 @@ type LilypondTemplateInput struct {
 }
 
 func GetLilypondExec(in, out string) *exec.Cmd {
-	cmd := exec.Command("lilypond", "--png", "-o", out, in)
+	cmd := exec.Command("lilypond", "-dbackend=eps", "-dsafe", "--png", "-o", out, in)
 	cmd.Dir = "./lilypond"
 	return cmd
 }

@@ -1,5 +1,10 @@
 \version "{{ .LilypondVersion }}"
-\include "lilypond-book-preamble.ly"
-\score { { \omit Staff.TimeSignature
+
+
+\header {
+tagline=##f
+}
+
+\score { { \omit Staff.TimeSignature \magnifyStaff #6/10
 {{ .Score }}
 }}
