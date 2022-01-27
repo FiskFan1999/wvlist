@@ -40,6 +40,7 @@ type CurrentSingle struct {
 	ComposerDeath int    `json:"death"`
 	Notes         []Note
 	WVList        []WVEntry
+	Lock          string `json:"lock"` // basic lock, prevents from further editing
 }
 
 func GetAllCurrent() FullCurrentList {
