@@ -1,4 +1,10 @@
+# GIT_COMMIT and GIT_TAG borrowed from ergo open source project:
+# https://raw.githubusercontent.com/ergochat/ergo/master/Makefile
+
+GIT_COMMIT := $(shell git rev-parse HEAD 2> /dev/null)
+GIT_TAG := $(shell git tag --points-at HEAD 2> /dev/null | head -n 1)
+
 all:
-	go build
+	go build -ldflags="-X main.Commit=$(GIT_COMMIT) -X main.Version=$(GIT_TAG)"
 clean:
 	rm -f ./wvlist

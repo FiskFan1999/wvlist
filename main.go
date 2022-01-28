@@ -8,7 +8,15 @@ import (
 	"sync"
 )
 
+var Commit string
+var Version string
+
 func main() {
+	if Version == "" {
+		Version = "Unreleased"
+	}
+	fmt.Println("Running wvlist commit ", Commit)
+	fmt.Println("Running wvlist version", Version)
 	//Full Params with falue from flags
 
 	Params = new(ParamsStr)
@@ -27,6 +35,8 @@ func main() {
 	if err := RehashConfig(); err != nil {
 		panic(err)
 	}
+	FullConfig.Commit = Commit
+	FullConfig.Version = Version
 	fmt.Println(FullConfig)
 
 	/*

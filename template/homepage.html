@@ -6,7 +6,7 @@
     </head>
     <body>
         <div>
-            <h1>{{ .Name }}</h1>
+            <h1>{{ .Config.Name }}</h1>
             {{ if .Table }}
             <div style="border:0 solid black;margin:0;padding:0;">
                 <ul style="display:flex;flex-wrap:wrap;">
@@ -28,6 +28,7 @@
                 <li><a href="/view/{{.Path}}">{{.Name}}</a></li>
                 {{ end }}
             </ul>
+            <span>Running wvlist {{.Config.Version }} ({{.Config.Commit}})</span>
         </div>
     </body>
 </html>

@@ -20,6 +20,7 @@ type HomepageMenuContentSingle struct {
 
 type HomePageTemplateInput struct {
 	List       []FullListIndex
+	Config     ConfigStr
 	Name       string
 	Table      []HomepageMenuContentSingle
 	SearchTerm string
@@ -38,7 +39,7 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 	fullList := GetAllLists()
 
 	var inp HomePageTemplateInput
-	inp.Name = FullConfig.Name
+	inp.Config = *FullConfig
 	inp.List = fullList
 	inp.Table = GetHomePageMenuContents()
 

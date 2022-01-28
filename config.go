@@ -9,6 +9,8 @@ import (
 type ConfigStr struct {
 	Name            string `json:"name"`
 	LilypondVersion string `json:"lilypond_version"`
+	Commit          string // set by linker
+	Version         string // set by linker
 }
 
 var FullConfig *ConfigStr
