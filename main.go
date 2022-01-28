@@ -43,6 +43,9 @@ func main() {
 	pmux.HandleFunc("/view/", ViewPage)
 	tmux.HandleFunc("/view/", ViewPage)
 
+	pmux.HandleFunc("/lilysand/", LilypondSandbox)
+	tmux.HandleFunc("/lilysand/", LilypondSandbox)
+
 	pmux.HandleFunc("/incipit/", GetLilypond)
 	tmux.HandleFunc("/incipit/", GetLilypond)
 

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/style.css">
+    </head>
+
+    <body>
+        <div>
+            <a href="/">Go Home</a>
+            <form method="get">
+                <h3 style="margin:0;font-family:monospace;">\score {</h3>
+                <input size="50" maxlength="{{ .CommandMaxLength }}" type="text" id="lilypond" value="{{.Command}}" name="lilypond">
+                <h3 style="margin:0;font-family:monospace;">}</h3>
+                <input type="submit" value="Submit">
+                <button onclick="saveToClipboard()">Copy to Clipboard</button>
+            </form>
+            {{ if .ImageHref }}
+            <center><img style="margin-top:1em;" src="{{.ImageHref}}"></center>
+            {{ end }}
+            {{ if .CommandOutput}}
+            <pre style="font-family:monospace;">{{.CommandOutput}}</pre>
+            {{end}}
+        </div>
+
+
+        <script>
+function saveToClipboard() {
+                var ctext = document.getElementById("lilypond");
+                ctext.select();
+                ctext.setSelectionRange(0,512);
+                navigator.clipboard.writeText(ctext.value);
+                alert("Copied lilypond input to clipboard. Note that this may not work on all browsers.");
+            }
+        </script>
+
+
+
+
+
+
+
+    </body>
+
+</html>
