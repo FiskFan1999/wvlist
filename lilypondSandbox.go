@@ -24,11 +24,12 @@ const (
 )
 
 type LilySandInput struct {
-	IsPost           bool
-	Command          string
-	CommandMaxLength uint
-	CommandOutput    string
-	ImageHref        string
+	IsPost             bool
+	Command            string
+	CommandBeginLength uint
+	CommandMaxLength   uint
+	CommandOutput      string
+	ImageHref          string
 }
 
 func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
@@ -44,6 +45,7 @@ func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
 	if len(query_lilypond) > 0 {
 		lsi.Command = html.UnescapeString(strings.TrimSpace(query_lilypond[0]))
 	}
+	lsi.CommandBeginLength = uint(len(lsi.Command))
 	lsi.IsPost = len(lsi.Command) != 0 // Note: r.PostFormValue silently returns null string if is GET
 	lsi.CommandMaxLength = InputMaxLength
 

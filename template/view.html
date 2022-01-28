@@ -8,6 +8,7 @@
         <div>
             <a href="/">Go home</a>
             <h1 >{{ .ComposerFirst }} {{.ComposerLast}} ({{ .ComposerBirth}}-{{if ne .ComposerDeath 0}}{{.ComposerDeath}}{{end}})</h1>
+            <a href="#tablej">Jump to table</a>
             <div style="border:solid black 0;max-width:25em;margin:0px;">
             {{ range .Notes }}
             <p>{{.Message}}</p>
@@ -19,7 +20,7 @@
                 <h4 style="margin:2px;">{{.Lock}}</h4>
             </div>
             {{ end }}
-            <table>
+            <table id="tablej">
                 <tr>
                     <th>
                         <abbr title="Title of classification. For example, Opus, BWV, K, etc.">Class.</abbr>
