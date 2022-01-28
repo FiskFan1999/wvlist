@@ -26,12 +26,12 @@ type LilypondTemplateInput struct {
 	Score           string
 }
 
-func GetLilypondExec(in, out, dir string) *exec.Cmd {
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+func GetLilypondExec(in, out, dir string) (*exec.Cmd, context.CancelFunc) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	//defer cancel()
 	cmd := exec.CommandContext(ctx, "lilypond", "-dbackend=eps", "-dsafe", "--png", "-o", out, in)
 	cmd.Dir = dir
-	return cmd
+	return cmd, cancel
 }
 
 func CreateLilypondIncipit(originalScore, filename string) {
@@ -74,7 +74,8 @@ func CreateLilypondIncipit(originalScore, filename string) {
 	}
 	fmt.Println("written to file", tmpFile.Name())
 
-	command := GetLilypondExec(tmpFile.Name(), filename, "./lilypond")
+	command, cancel := GetLilypondExec(tmpFile.Name(), filename, "./lilypond")
+	defer cancel()
 	combinedOutput, err := command.CombinedOutput()
 	fmt.Println(string(combinedOutput))
 	if err != nil {

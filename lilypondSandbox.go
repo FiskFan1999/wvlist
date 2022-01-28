@@ -124,7 +124,8 @@ func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
 			}
 		}(tmpFileOutWD)
 
-		lilypondExec := GetLilypondExec(tmpFileIn.Name()[len("./rootstatic/"):], tmpFileOut.Name()[len("./rootstatic/"):], "./rootstatic")
+		lilypondExec, cancel := GetLilypondExec(tmpFileIn.Name()[len("./rootstatic/"):], tmpFileOut.Name()[len("./rootstatic/"):], "./rootstatic")
+		defer cancel()
 
 		combinedOutput, err := lilypondExec.CombinedOutput()
 
