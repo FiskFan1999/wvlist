@@ -6,7 +6,8 @@
     </head>
     <body>
         <div>
-            <h1 style="margin-top:0;">{{ .ComposerFirst }} {{.ComposerLast}} ({{ .ComposerBirth}}-{{if ne .ComposerDeath 0}}{{.ComposerDeath}}{{end}})</h1>
+            <a href="/">Go home</a>
+            <h1 >{{ .ComposerFirst }} {{.ComposerLast}} ({{ .ComposerBirth}}-{{if ne .ComposerDeath 0}}{{.ComposerDeath}}{{end}})</h1>
             <div style="border:solid black 0;max-width:25em;margin:0px;">
             {{ range .Notes }}
             <p>{{.Message}}</p>

@@ -6,7 +6,16 @@
     </head>
     <body>
         <div>
-            <h1>This is the home page.</h1>
+            <h1>{{ .Name }}</h1>
+            {{ if .Table }}
+            <div style="border:0 solid black;margin:0;padding:0;">
+                <ul style="display:flex;flex-wrap:wrap;">
+                {{ range .Table }}
+                <li style="margin-right:2em;"><a href="{{.Href}}">{{.Name}}</a></li>
+                {{ end }}
+                </ul>
+            </div>
+            {{ end }}
             <ul>
                 {{ range .List }}
                 <li><a href="/view/{{.Path}}">{{.Name}}</a></li>

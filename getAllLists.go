@@ -18,11 +18,6 @@ type FullListIndex struct {
 	Path string
 }
 
-type HomePageTemplateInput struct {
-	List []FullListIndex
-	Name string
-}
-
 func GetAllLists() (FullIndexList []FullListIndex) {
 
 	dir, err := os.ReadDir("current")
