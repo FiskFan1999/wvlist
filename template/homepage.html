@@ -16,7 +16,14 @@
                 </ul>
             </div>
             {{ end }}
+            <form method="get">
+                <input placeholder="Search by Composer's name" type="text" id="search" name="search" value="{{ .SearchTerm }}">
+                <input type="submit" value="Search">
+            </form>
             <ul>
+                {{ if .SearchTerm }}
+                <h4 style="margin:0;">Search results for {{ .SearchTerm }}:</h4>
+                {{end}}
                 {{ range .List }}
                 <li><a href="/view/{{.Path}}">{{.Name}}</a></li>
                 {{ end }}

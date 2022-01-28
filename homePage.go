@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"github.com/gosimple/unidecode"
 	"html/template"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type HomepageMenuContentSingle struct {
@@ -14,12 +16,13 @@ type HomepageMenuContentSingle struct {
 	Href string
 }
 
-type FullHomepageMenuContents []HomepageMenuContentSingle
+//type FullHomepageMenuContents []HomepageMenuContentSingle
 
 type HomePageTemplateInput struct {
-	List  []FullListIndex
-	Name  string
-	Table []HomepageMenuContentSingle
+	List       []FullListIndex
+	Name       string
+	Table      []HomepageMenuContentSingle
+	SearchTerm string
 }
 
 func HomePage(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +42,19 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 	inp.List = fullList
 	inp.Table = GetHomePageMenuContents()
 
+	/*
+		Parse search and if there is a searched query,
+		search for composers by that name
+	*/
+
+	searchQueryTermList := r.URL.Query()["search"]
+	if len(searchQueryTermList) != 0 && len(searchQueryTermList[0]) != 0 {
+		searchQueryTerm := searchQueryTermList[0]
+		inp.SearchTerm = searchQueryTerm
+		fmt.Println("searching", searchQueryTerm)
+		inp.List = GetResultsSearchComposerIndex(inp.List[:], searchQueryTerm)
+	}
+
 	homeTemplatePath := "./template/homepage.html"
 	tmp, err := template.ParseFiles(homeTemplatePath)
 	if err != nil {
@@ -48,7 +64,7 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 	tmp.Execute(w, inp)
 }
 
-func GetHomePageMenuContents() (menu FullHomepageMenuContents) {
+func GetHomePageMenuContents() (menu []HomepageMenuContentSingle) {
 	filename := "homepageMenuContents.csv"
 	file, err := os.ReadFile(filename)
 	if err != nil {
@@ -76,5 +92,19 @@ func GetHomePageMenuContents() (menu FullHomepageMenuContents) {
 		menu = append(menu, nextItem)
 	}
 
+	return
+}
+
+func GetResultsSearchComposerIndex(origContents []FullListIndex, query string) (finalContents []FullListIndex) {
+	for _, row := range origContents {
+		nameToSearch := row.Name
+		nameToSearchUni := unidecode.Unidecode(nameToSearch)
+
+		if strings.Contains(strings.ToLower(nameToSearch), strings.ToLower(query)) ||
+			strings.Contains(strings.ToLower(nameToSearchUni), strings.ToLower(query)) {
+			// Found a match
+			finalContents = append(finalContents, row)
+		}
+	}
 	return
 }
