@@ -53,11 +53,17 @@ func main() {
 	pmux.HandleFunc("/view/", ViewPage)
 	tmux.HandleFunc("/view/", ViewPage)
 
+	pmux.HandleFunc("/submit/", SubmitPage)
+	tmux.HandleFunc("/submit/", SubmitPage)
+
 	pmux.HandleFunc("/lilysand/", LilypondSandbox)
 	tmux.HandleFunc("/lilysand/", LilypondSandbox)
 
 	pmux.HandleFunc("/incipit/", GetLilypond)
 	tmux.HandleFunc("/incipit/", GetLilypond)
+
+	pmux.HandleFunc("/api/v1/", APIv1Handler)
+	tmux.HandleFunc("/api/v1/", APIv1Handler)
 
 	// run plain and tls listeners concurrently
 	wg := new(sync.WaitGroup)

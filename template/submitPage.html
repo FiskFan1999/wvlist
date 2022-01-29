@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/style.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <a href="/">Go home</a>
+            <h1>{{ .Config.Name }} Submission</h1>
+            <p>{{.SubmissionMessage}}</p>
+
+            <div style="margin:0;padding:5px;">
+                <form id="composer">
+                    <h3>Composer</h3>
+                    <span>Last Name</span>
+                    <input type="text" name="composerLast" id="composerLast">
+                    <span style="margin-left:1em;">First/Middle Name</span>
+                    <input type="text" name="composerFirst" id="composerFirst">
+                    <br><span>Date of Birth</span>
+                    <input type="number" name="birth" id="birth">
+                    <span>Date of Death</span>
+                    <input type="number" name="death" id="death">
+                    <br><span>(If still alive, please enter "0")</span>
+                <h3>Compositions</h3>
+                <table id="compositiontable">
+                <tr>
+                    <th>
+                        <abbr title="Title of classification. For example, Opus, BWV, K, etc.">Class.</abbr>
+                    </th>
+                    <th>
+                        No.
+                    </th>
+                    <th>
+                        Other
+                    </th>
+                    <th>
+                        Title
+                    </th>
+                    <th>
+                        Incipit
+                    </th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                    <tr>
+                        <td>
+                            <input size=10 type="text" name="classification" id="classification">
+                        </td>
+                        <td>
+                            <input size=5 type="text" name="number" id="number">
+                        </td>
+                        <td>
+                            <input size=5 type="text" name="other" id="other">
+                        </td>
+                        <td>
+                            <input size=30 type="text" name="title" id="title">
+                        </td>
+                        <td>
+                            <input size=20 type="text" name="incipit" id="incipit">
+                        </td>
+                        <td>
+                            <input type="button" value="Down" onclick="moveRowDown(this)">
+                        </td>
+                        <td>
+                            <input type="button" value="Up" onclick="moveRowUp(this)">
+                        </td>
+                        <td>
+                            <input type="button" value="Delete" onclick="deleteRow(this)">
+                        </td>
+                    </tr>
+                </table>
+                <input type=button value="Add more rows" onclick="addRows()">
+                <input type="button" value="Submit" onclick="makeSubmission()">
+                </form>
+            </div>
+        </div>
+<script type="text/javascript">
+    function makeSubmission() {
+            if (false === confirm("Are you sure you want to submit?")) {
+                    return false;
+                }
+
+            var formData = JSON.stringify($("#composer").serializeArray());
+            console.log(formData);
+            $.ajax({
+                    type: "POST",
+                    url: "/api/v1/uploadugly",
+                    data: formData,
+                    success: function(){},
+                    dataType: "json",
+                    contentType: "application/json"
+                });
+        }
+
+    function addRows() {
+            // insertRows(-1) appends row
+            for (var i = 0; i < 1; i++) {
+            var table = document.getElementById("compositiontable");
+            var row = table.insertRow(-1);
+            var cell1 = row.insertCell(0);
+            cell1.innerHTML = "<input size=10 type=\"text\" name=\"classification\" id=\"classification\">";
+            var cell2 = row.insertCell(1);
+            cell2.innerHTML = '<input size=5 type="text" name="number" id="number">';
+            var cell3 = row.insertCell(2);
+            cell3.innerHTML = '<input size=5 type="text" name="other" id="other">';
+            var cell4 = row.insertCell(3);
+            cell4.innerHTML = '<input size=30 type="text" name="title" id="title">';
+            var cell5 = row.insertCell(4);
+            cell5.innerHTML = '<input size=20 type="text" name="incipit" id="incipit">';
+            var cell6 = row.insertCell(5);
+            cell6.innerHTML = '<input type="button" value="Down" onclick="moveRowDown(this)">';
+            var cell7 = row.insertCell(6);
+            cell7.innerHTML = '<input type="button" value="Up" onclick="moveRowUp(this)">';
+            var cell8 = row.insertCell(7);
+            cell8.innerHTML = '<input type="button" value="Delete" onclick="deleteRow(this)">';
+            }
+        }
+    function moveRowUp(r){
+            var row = $(r).parents("tr:first");
+            var index = r.parentNode.parentNode.rowIndex;
+            if (index < 2){
+                    return
+                }
+            row.insertBefore(row.prev());
+        }
+    function moveRowDown(r){
+            var row = $(r).parents("tr:first");
+            row.insertAfter(row.next());
+        }
+    function deleteRow(r){
+            var index = r.parentNode.parentNode.rowIndex;
+            document.getElementById("compositiontable").deleteRow(index);
+        }
+</script>
+    </body>
+</html>
