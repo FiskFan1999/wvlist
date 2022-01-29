@@ -128,6 +128,8 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 			TODO: send SMTP email to sanitizedInputStr.SubmitEmail
 		*/
 
+		go Apiv1SendSmtpEmailForSubmitUgly(sanitizedInputStr)
+
 		/*
 			Marshall sanitizedInputStr to a new tempfile in /submissions/
 		*/
