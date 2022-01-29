@@ -13,16 +13,23 @@
 
             <div style="margin:0;padding:5px;">
                 <form id="composer">
-                    <h3>Composer</h3>
+                    <h3 style="margin-top:0;">Composer</h3>
                     <span>Last Name</span>
-                    <input type="text" name="composerLast" id="composerLast">
+                    <input type="text" name="composerLast" id="composerLast" placeholder="Required" required>
                     <span style="margin-left:1em;">First/Middle Name</span>
                     <input type="text" name="composerFirst" id="composerFirst">
-                    <br><span>Date of Birth</span>
-                    <input type="number" name="birth" id="birth">
-                    <span>Date of Death</span>
-                    <input type="number" name="death" id="death">
-                    <br><span>(If still alive, please enter "0")</span>
+                    <br><span>Year of Birth</span>
+                    <input type="number" name="birth" id="birth" placeholder="" required>
+                    <span>Year of Death</span>
+                    <input type="number" name="death" id="death" placeholder="" required>
+                    <h4>Notes</h4>
+                    <textarea rows="3" cols="40" name="notes" placeholder="Notes about composer, information about sources, etc." id="notes"></textarea>
+                    <h4>Author of Submission</h4>
+                    <label for="submitname">Submitter's name</label>
+                    <input type="text" size=30 name="submitname" placeholder="Leave blank for anonymous" id="submitname">
+                    <br><label for="email">Verification Email</label>
+                    <input type="email" placeholder="optional" name="email" id="email">
+                    <p><span style="font-style:italic;">Note about email: </span>Note goes here</p>
                 <h3>Compositions</h3>
                 <table id="compositiontable">
                 <tr>
