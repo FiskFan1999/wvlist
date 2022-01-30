@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func SendSMTPEmail(to []string, subject string, message []byte, attachments ...string) {
+func SendSMTPEmail(to []string, subject string, html []byte, attachments ...string) {
 	fmt.Println("SMTP: Sending email to", to, "subject", subject)
 	em := email.NewEmail()
 	em.From = "server@wvlist.net"
@@ -17,7 +17,7 @@ func SendSMTPEmail(to []string, subject string, message []byte, attachments ...s
 		em.Bcc = FullConfig.SmtpAdminBCC
 	}
 	em.Subject = subject
-	em.Text = message
+	em.HTML = html
 	for _, att := range attachments {
 		em.AttachFile(att)
 	}
@@ -25,7 +25,7 @@ func SendSMTPEmail(to []string, subject string, message []byte, attachments ...s
 	if err != nil {
 		fmt.Println("smtp error:", err.Error())
 	} else {
-		fmt.Println("email.SendWithStartTLS completed with no errors")
+		fmt.Println("email.SendWithStartTLS completed.")
 	}
 }
 
