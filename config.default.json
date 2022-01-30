@@ -2,8 +2,9 @@
     "name": "wvlist",
     "lilypond_version": "2.20.0",
     "smtp_destination": "",
+    "smtp_port": 587,
     "smtp_username": "",
     "smtp_password": "",
-    "smtp_adminbcc": ""
+    "smtp_adminbcc": []
 
 }

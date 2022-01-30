@@ -1,3 +1,19 @@
 > "name": string
 The name of the instance. For the default hosted
 instance, this is "wvlist.net"
+
+> "lilypond_version": string/"2.20.0"
+The version of lilypond which is installed in the system. Note that this value is inserted into the lilypond template, "\version "2.20.0".
+
+> "smtp_destination": string
+Hostname of the SMTP server that is being used. (For example, email-smtp.eu-west-1.amazonaws.com)
+
+> "smtp_port": int/587
+The port to connect to at the SMTP server. Note that by default, StartTLS is used. Consult your SMTP server provider.
+
+> "smtp_username": string
+> "smtp_password": string
+The username and password that you will use to connect to SMTP. Consult your SMTP server provider.
+
+> "smtp_adminbcc": []string
+If set, any email sent by wvlist will be BCC'd to these addresses. Note that this value is an ARRAY of strings, and multiple email addresses may be specified.
