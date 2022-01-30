@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/thanhpk/randstr"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -153,6 +154,16 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err.Error())
 			http.Error(w, "500 Internal server error "+err.Error(), 500)
 			return
+		}
+
+		// Generate a random sequence of bytes to be send for the email verification
+
+		verifyPassword := randstr.Hex(48)
+		fmt.Println("password", (verifyPassword))
+		passwordFilename := strings.TrimRight(file.Name(), "unverified") + "password"
+		err = os.WriteFile(passwordFilename, []byte(verifyPassword), 0666)
+		if err != nil {
+			fmt.Println("password file error", err.Error())
 		}
 
 		w.WriteHeader(201)
