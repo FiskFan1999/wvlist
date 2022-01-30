@@ -1,4 +1,9 @@
 {
     "name": "wvlist",
-    "lilypond_version": "2.20.0"
+    "lilypond_version": "2.20.0",
+    "smtp_destination": "",
+    "smtp_username": "",
+    "smtp_password": "",
+    "smtp_adminbcc": ""
+
 }

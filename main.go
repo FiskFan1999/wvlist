@@ -30,7 +30,7 @@ func main() {
 
 	flag.Parse()
 
-	//Load config
+	// Load config
 	FullConfig = new(ConfigStr)
 	if err := RehashConfig(); err != nil {
 		panic(err)
@@ -39,53 +39,77 @@ func main() {
 	FullConfig.Version = Version
 	fmt.Println(FullConfig)
 
-	/*
-		Create seperate plaintext and TLS muxers
-		(plaintext mux will disable operator
-		console)
-	*/
-	pmux := http.NewServeMux()
-	tmux := http.NewServeMux()
+	argv := flag.Args()
 
-	pmux.HandleFunc("/", HomePage)
-	tmux.HandleFunc("/", HomePage)
-
-	pmux.HandleFunc("/view/", ViewPage)
-	tmux.HandleFunc("/view/", ViewPage)
-
-	pmux.HandleFunc("/submit/", SubmitPage)
-	tmux.HandleFunc("/submit/", SubmitPage)
-
-	pmux.HandleFunc("/lilysand/", LilypondSandbox)
-	tmux.HandleFunc("/lilysand/", LilypondSandbox)
-
-	pmux.HandleFunc("/incipit/", GetLilypond)
-	tmux.HandleFunc("/incipit/", GetLilypond)
-
-	pmux.HandleFunc("/api/v1/", APIv1Handler)
-	tmux.HandleFunc("/api/v1/", APIv1Handler)
-
-	// run plain and tls listeners concurrently
-	wg := new(sync.WaitGroup)
-	wg.Add(1)
-	if Params.PlaintextPort != 0 {
-		wg.Add(1)
-		go func() {
-			http.ListenAndServe(":"+strconv.FormatUint(Params.PlaintextPort, 10), pmux)
-			wg.Done()
-		}()
+	if len(argv) == 0 {
+		argv = []string{""}
 	}
-	if Params.TLSPort != 0 {
+
+	switch argv[0] {
+	case "sendemail":
+		if len(argv) != 2 {
+			fmt.Println("./wvlist sendemail <to>")
+			return
+		}
+		to := argv[1]
+		fmt.Println("Sending email to " + to)
+		SendTestSMTPEmail(to)
+
+	case "run":
+		/*
+			Operate the server and listen as normal
+		*/
+		//Load config
+		/*
+			Create seperate plaintext and TLS muxers
+			(plaintext mux will disable operator
+			console)
+		*/
+		pmux := http.NewServeMux()
+		tmux := http.NewServeMux()
+
+		pmux.HandleFunc("/", HomePage)
+		tmux.HandleFunc("/", HomePage)
+
+		pmux.HandleFunc("/view/", ViewPage)
+		tmux.HandleFunc("/view/", ViewPage)
+
+		pmux.HandleFunc("/submit/", SubmitPage)
+		tmux.HandleFunc("/submit/", SubmitPage)
+
+		pmux.HandleFunc("/lilysand/", LilypondSandbox)
+		tmux.HandleFunc("/lilysand/", LilypondSandbox)
+
+		pmux.HandleFunc("/incipit/", GetLilypond)
+		tmux.HandleFunc("/incipit/", GetLilypond)
+
+		pmux.HandleFunc("/api/v1/", APIv1Handler)
+		tmux.HandleFunc("/api/v1/", APIv1Handler)
+
+		// run plain and tls listeners concurrently
+		wg := new(sync.WaitGroup)
 		wg.Add(1)
-		go func() {
-			if Params.DebugModeTLS {
-				http.ListenAndServe(":"+strconv.FormatUint(Params.TLSPort, 10), tmux)
-			} else {
-				http.ListenAndServeTLS(":"+strconv.FormatUint(Params.TLSPort, 10), Params.FullCert, Params.PrivCert, tmux)
-			}
-			wg.Done()
-		}()
+		if Params.PlaintextPort != 0 {
+			wg.Add(1)
+			go func() {
+				http.ListenAndServe(":"+strconv.FormatUint(Params.PlaintextPort, 10), pmux)
+				wg.Done()
+			}()
+		}
+		if Params.TLSPort != 0 {
+			wg.Add(1)
+			go func() {
+				if Params.DebugModeTLS {
+					http.ListenAndServe(":"+strconv.FormatUint(Params.TLSPort, 10), tmux)
+				} else {
+					http.ListenAndServeTLS(":"+strconv.FormatUint(Params.TLSPort, 10), Params.FullCert, Params.PrivCert, tmux)
+				}
+				wg.Done()
+			}()
+		}
+		wg.Done()
+		wg.Wait()
+	default:
+		fmt.Println("./wvlist run or ./wvlist sendemail")
 	}
-	wg.Done()
-	wg.Wait()
 }

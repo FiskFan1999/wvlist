@@ -7,10 +7,15 @@ import (
 )
 
 type ConfigStr struct {
-	Name            string `json:"name"`
-	LilypondVersion string `json:"lilypond_version"`
-	Commit          string // set by linker
-	Version         string // set by linker
+	Name            string   `json:"name"`
+	LilypondVersion string   `json:"lilypond_version"`
+	SmtpDestination string   `json:"smtp_destination"`
+	SmtpPort        int      `json:"smtp_port"`
+	SmtpUsername    string   `json:"smtp_username"`
+	SmtpPassword    string   `json:"smtp_password"`
+	SmtpAdminBCC    []string `json:"smtp_adminbcc"`
+	Commit          string   // set by linker
+	Version         string   // set by linker
 }
 
 var FullConfig *ConfigStr
