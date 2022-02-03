@@ -34,6 +34,48 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 	argv := argvraw[1:]
 
 	switch command {
+	case "verify":
+		if len(argv) != 2 {
+			http.Error(w, "Bad request: usage /api/v1/verify/<id>/<password>", 400)
+			return
+		}
+		id := argv[0]
+		password := argv[1]
+
+		BadRequestMessage := "Bad Request: This submission already verified, submission file not found, or password incorrect"
+		mainFileName := "./submissions/submission." + id + ".unverified"
+		mainFileNameIfAccepted := "./submissions/submission." + id + ".verified"
+		PasswordFileName := "./submissions/submission." + id + ".password"
+
+		_, err := os.ReadFile(mainFileName)
+		if err != nil && os.IsNotExist(err) {
+			http.Error(w, BadRequestMessage, 400)
+			return
+		}
+		//If that test succeeds, check the password
+
+		passwordFileText, err := os.ReadFile(PasswordFileName)
+		if err != nil && os.IsNotExist(err) {
+			http.Error(w, BadRequestMessage, 400)
+			return
+		}
+
+		if string(passwordFileText) == password {
+			// Password accepted.
+			// change the filename to accepted submission
+			if linkerr := os.Rename(mainFileName, mainFileNameIfAccepted); linkerr != nil {
+				http.Error(w, linkerr.Error(), 500)
+				return
+			}
+
+		} else {
+			http.Error(w, BadRequestMessage, 400)
+			return
+		}
+
+		//TODO: better submission accepting page
+		fmt.Fprintln(w, "Thank you for your submission")
+
 	case "uploadugly":
 		if r.Method != "POST" {
 			http.Error(w, "405 Only POST method is allowed", 405)
@@ -126,12 +168,6 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("%+v\n", sanitizedInputStr)
 
 		/*
-			TODO: send SMTP email to sanitizedInputStr.SubmitEmail
-		*/
-
-		go Apiv1SendSmtpEmailForSubmitUgly(sanitizedInputStr)
-
-		/*
 			Marshall sanitizedInputStr to a new tempfile in /submissions/
 		*/
 
@@ -142,6 +178,9 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer file.Close()
+
+		fileNoEnding := strings.TrimRight(file.Name(), ".unverified")
+		fileIndex := strings.TrimLeft(fileNoEnding, "./submissions/submission.")
 
 		marshaled, err := json.Marshal(sanitizedInputStr)
 		if err != nil {
@@ -158,13 +197,19 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 
 		// Generate a random sequence of bytes to be send for the email verification
 
-		verifyPassword := randstr.Hex(48)
+		verifyPassword := randstr.Hex(16)
 		fmt.Println("password", (verifyPassword))
-		passwordFilename := strings.TrimRight(file.Name(), "unverified") + "password"
+		passwordFilename := fileNoEnding + ".password"
 		err = os.WriteFile(passwordFilename, []byte(verifyPassword), 0666)
 		if err != nil {
 			fmt.Println("password file error", err.Error())
 		}
+
+		/*
+			TODO: send SMTP email to sanitizedInputStr.SubmitEmail
+		*/
+
+		go Apiv1SendSmtpEmailForSubmitUgly(sanitizedInputStr, fileIndex, verifyPassword)
 
 		w.WriteHeader(201)
 

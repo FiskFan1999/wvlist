@@ -6,12 +6,16 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 )
 
 var Commit string
 var Version string
 
 func main() {
+
+	EmailCoolDown = make(map[string]time.Time)
+
 	if Version == "" {
 		Version = "Unreleased"
 	}
