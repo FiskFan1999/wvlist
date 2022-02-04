@@ -19,8 +19,6 @@ func main() {
 	if Version == "" {
 		Version = "Unreleased"
 	}
-	fmt.Println("Running wvlist commit ", Commit)
-	fmt.Println("Running wvlist version", Version)
 	//Full Params with falue from flags
 
 	Params = new(ParamsStr)
@@ -116,8 +114,14 @@ func main() {
 		wg.Done()
 		wg.Wait()
 	case "password":
-		MakePasswordHashCommand()
+		if len(argv) == 2 {
+			MakePasswordHashCommand(argv[1])
+		} else {
+			MakePasswordHashCommand("")
+		}
 	default:
-		fmt.Println("./wvlist run or ./wvlist sendemail")
+		fmt.Println(`./wvlist run
+./wvlist sendemail <to>
+./wvlist password [password]`)
 	}
 }

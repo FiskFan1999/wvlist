@@ -115,32 +115,40 @@ func AdminConsolePlaintextHandler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Admin console is forbidden over plaintext.", 403)
 }
 
-func MakePasswordHashCommand() {
+func MakePasswordHashCommand(password string) {
 	/*
 		Function is run by calling ./wvlist password
 	*/
-	fmt.Printf("Password: ")
-	passwd1, err := term.ReadPassword(int(os.Stdin.Fd()))
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
+	var passwd1 []byte
+	var passwd2 []byte
 
-	fmt.Printf("\nRe-enter: ")
-	passwd2, err := term.ReadPassword(int(os.Stdin.Fd()))
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	fmt.Println()
-	if len(passwd1) == 0 || len(passwd2) == 0 {
-		fmt.Println("ERROR: password may not be empty.")
-		MakePasswordHashCommand() // re run
+	if len(password) != 0 {
+		passwd1 = []byte(password)
+		passwd2 = []byte(password)
+	} else {
+		fmt.Printf("Password: ")
+		passwd1, err := term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+
+		fmt.Printf("\nRe-enter: ")
+		passwd2, err := term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		fmt.Println()
+		if len(passwd1) == 0 || len(passwd2) == 0 {
+			fmt.Println("ERROR: password may not be empty.")
+			MakePasswordHashCommand("") // re run
+		}
 	}
 
 	if string(passwd1) != string(passwd2) {
 		fmt.Println("ERROR: you did not enter the same password.")
-		MakePasswordHashCommand() // re run
+		MakePasswordHashCommand("") // re run
 	}
 
 	hash, err := bcrypt.GenerateFromPassword(passwd1, BCRYPTCOST)
@@ -148,8 +156,12 @@ func MakePasswordHashCommand() {
 		fmt.Println("BCRYPT ERROR:", err.Error())
 		return
 	}
-	fmt.Println("\n\nhash: (enter the following has in the \"password\" field of the admin table in config.json)")
-	fmt.Println()
+	if len(password) == 0 {
+		fmt.Println("\n\nhash: (enter the following has in the \"password\" field of the admin table in config.json)")
+		fmt.Println()
+	}
 	fmt.Println(string(hash))
-	fmt.Println()
+	if len(password) == 0 {
+		fmt.Println()
+	}
 }
