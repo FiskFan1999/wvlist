@@ -41,7 +41,6 @@ func main() {
 	}
 	FullConfig.Commit = Commit
 	FullConfig.Version = Version
-	fmt.Println(FullConfig)
 
 	argv := flag.Args()
 
@@ -90,6 +89,9 @@ func main() {
 		pmux.HandleFunc("/api/v1/", APIv1Handler)
 		tmux.HandleFunc("/api/v1/", APIv1Handler)
 
+		pmux.HandleFunc("/admin/", AdminConsolePlaintextHandler)
+		tmux.HandleFunc("/admin/", AdminConsole)
+
 		// run plain and tls listeners concurrently
 		wg := new(sync.WaitGroup)
 		wg.Add(1)
@@ -113,6 +115,8 @@ func main() {
 		}
 		wg.Done()
 		wg.Wait()
+	case "password":
+		MakePasswordHashCommand()
 	default:
 		fmt.Println("./wvlist run or ./wvlist sendemail")
 	}

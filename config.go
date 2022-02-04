@@ -6,16 +6,25 @@ import (
 	"io/ioutil"
 )
 
+type ConfigAdminInfo struct {
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	HideEmail bool   `json:"hideemail"`
+	Username  string `json:"username"`
+	Hash      string `json:"hash"`
+}
+
 type ConfigStr struct {
-	Name            string   `json:"name"`
-	LilypondVersion string   `json:"lilypond_version"`
-	SmtpDestination string   `json:"smtp_destination"`
-	SmtpPort        int      `json:"smtp_port"`
-	SmtpUsername    string   `json:"smtp_username"`
-	SmtpPassword    string   `json:"smtp_password"`
-	SmtpAdminBCC    []string `json:"smtp_adminbcc"`
-	Commit          string   // set by linker
-	Version         string   // set by linker
+	Name            string            `json:"name"`
+	LilypondVersion string            `json:"lilypond_version"`
+	SmtpDestination string            `json:"smtp_destination"`
+	SmtpPort        int               `json:"smtp_port"`
+	SmtpUsername    string            `json:"smtp_username"`
+	SmtpPassword    string            `json:"smtp_password"`
+	SmtpAdminBCC    []string          `json:"smtp_adminbcc"`
+	Admins          []ConfigAdminInfo `json:"admins"`
+	Commit          string            // set by linker
+	Version         string            // set by linker
 }
 
 var FullConfig *ConfigStr

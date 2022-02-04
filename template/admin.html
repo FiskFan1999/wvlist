@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+        <div>
+            <a href="/">Go home</a>
+            <form method="get">
+                <input size=60 id="command" name="command" type="text">
+            </form>
+            {{ if .Command }}
+            <h2 style="margin:2px;font-family:monospace;">{{ .Command }}</h2>
+            {{ else }}
+            <h2 style="margin:2px;font-family:monospace;">Administrator console</h2>
+            {{ end }}
+            {{ if .Output }}
+            <pre style="margin:2px;font-family:monospace;">{{ .Output }}</pre>
+            {{ end }}
+        </div>
+    </body>
+</html>
+

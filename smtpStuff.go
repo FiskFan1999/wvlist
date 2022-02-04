@@ -69,7 +69,7 @@ func CheckEmailCooldownUnsubscribe(a string) bool {
 		return false
 	}
 
-	return true
+	//return true
 }
 
 func CheckEmailUnsibscribe(addr string) bool {
