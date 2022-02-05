@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html"
 	"os"
 )
 
@@ -17,11 +16,12 @@ const (
 )
 
 type WVEntry struct {
-	Classifier  string
-	Number      string
-	Title       string
-	Incipit     string
-	IncipitHTML string
+	Classifier string
+	Number     string
+	Title      string
+	Incipit    string
+	ID         string // used for lilypond
+	RowNumber  int    // used for lilypond
 }
 
 type Note struct {
@@ -31,7 +31,6 @@ type Note struct {
 }
 
 type CurrentSingle struct {
-	//ID            string
 	ComposerFirst string `json:"first"`
 	ComposerLast  string `json:"last"`
 	ComposerBirth int    `json:"birth"`
@@ -88,7 +87,7 @@ func ParseCurrentSingle(id string) (*CurrentSingle, error) {
 
 	var AllWVEntries []WVEntry
 
-	for _, row := range CSVList {
+	for rowNumber, row := range CSVList {
 		if len(row) != WVEntryRowLength {
 			return nil, errors.New("CSV: row with invalid length found")
 		}
@@ -99,7 +98,8 @@ func ParseCurrentSingle(id string) (*CurrentSingle, error) {
 		newEntry.Number = row[1]
 		newEntry.Title = row[2]
 		newEntry.Incipit = row[3]
-		newEntry.IncipitHTML = html.EscapeString(row[3])
+		newEntry.RowNumber = rowNumber
+		newEntry.ID = id
 
 		if err != nil {
 			return nil, errors.New("CSV: non-number found in column 1")

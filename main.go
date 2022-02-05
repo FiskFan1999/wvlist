@@ -14,6 +14,9 @@ var Version string
 
 func main() {
 
+	LilypondFilesToMake = make(chan LilypondFileToMakeStr, 256)
+	go LilypondWriteIncipitsFromChannel()
+
 	EmailCoolDown = make(map[string]time.Time)
 
 	if Version == "" {

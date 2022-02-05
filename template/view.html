@@ -40,7 +40,7 @@
                     <td>{{.Classifier}}</td>
                     <td style="text-align:right;">{{.Number}}</td>
                     <td>{{.Title}}</td>
-                    <td>{{if .Incipit }}<img src="/incipit?f={{.IncipitHTML}}.png" alt="{{.Incipit}}">{{ end}}</td>
+                    <td>{{if .Incipit }}<img src="/incipit?id={{.ID}}&no={{.RowNumber}}" alt="{{.Incipit}}">{{ end}}</td>
                 </tr>
                 {{ end }}
             </table>
