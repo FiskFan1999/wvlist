@@ -12,6 +12,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
@@ -19,7 +20,9 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -30,7 +33,7 @@ const (
 ls - list all verified submissions
 vsub <id> - View a submission
 vedit <id> - View an edit
-accept <id> - Accept a submission`
+asub <id> - Accept a submission`
 )
 
 type AdminConsoleOutput struct {
@@ -222,6 +225,177 @@ func AdminViewSubmission(argv []string) string {
 	return buf.String()
 }
 
+func AdminAcceptSubmission(argv []string) string {
+	if len(argv) < 2 {
+		return "asub <id>"
+	}
+
+	id := argv[1]
+	submissionp, errorMessage := AdminGetSubmissionFromSnippet(id)
+	if errorMessage != "" {
+		return errorMessage
+	}
+
+	submission := *submissionp
+	if len(argv) < 3 || argv[2] != "confirm" {
+		return "About to accept " + submission.Name() + "\nAre you sure you want to do this? Type asub <id> confirm"
+	}
+
+	/*
+		Continue, and add the submission.
+	*/
+
+	subcontents, err := os.ReadFile(SubmissionsDirPath + submission.Name())
+	if err != nil {
+		return "read file error " + err.Error()
+	}
+
+	var substr V1UploadUglySanitizedInput
+	err = json.Unmarshal(subcontents, &substr)
+	if err != nil {
+		return "json unmarshal error " + err.Error()
+	}
+
+	var entry CurrentSingle
+
+	/*
+		Convert the items in substr to entry
+		Remember to not store the email at all
+		in the final form
+	*/
+
+	entry.ComposerFirst = substr.ComposerFirst
+	entry.ComposerLast = substr.ComposerLast
+	entry.ComposerBirth = substr.ComposerBirth
+	entry.ComposerDeath = substr.ComposerDeath
+	entry.Lock = ""
+
+	var note Note
+	note.Message = substr.Notes
+	note.Author = substr.SubmitName
+	note.DateSTR = GetCurrentDateStr()
+
+	entry.Notes = []Note{note}
+
+	/*
+		Get file to upload to
+	*/
+
+	newJsonFile, err := os.CreateTemp("./current/", "*.json")
+	if err != nil {
+		return ".json file create temp error: " + err.Error()
+	}
+	defer newJsonFile.Close()
+
+	entryJson, err := json.MarshalIndent(entry, "", " ")
+	if err != nil {
+		return ".json marshall: " + err.Error()
+	}
+
+	_, err = newJsonFile.Write(entryJson)
+	if err != nil {
+		return "json write error: " + err.Error()
+	}
+
+	// for now, write notes to .notes csv file also.
+
+	notesCsvFileName := strings.TrimRight(newJsonFile.Name(), ".json") + ".notes"
+	// note that this includes the directory, is a full relative path
+
+	notesCsvFile, err := os.Create(notesCsvFileName)
+	if err != nil {
+		return "notes csv file error: " + err.Error()
+	}
+	defer notesCsvFile.Close()
+
+	notesCsvListFull := make([][]string, 1)
+	notesCsvListFull[0] = make([]string, 3)
+	notesCsvListFull[0][0] = note.Author
+	notesCsvListFull[0][1] = note.DateSTR
+	notesCsvListFull[0][2] = note.Message
+
+	buf := new(bytes.Buffer)
+
+	w := csv.NewWriter(buf)
+	w.WriteAll(notesCsvListFull)
+	if w.Error() != nil {
+		return "csv notes write error: " + w.Error().Error()
+	}
+
+	_, err = notesCsvFile.Write(buf.Bytes())
+	if err != nil {
+		return "notes csv file write error: " + err.Error()
+	}
+
+	/*
+		Write wv entries to .csv file
+	*/
+
+	WVList := substr.CompositionList
+
+	WVListCSV := make([][]string, len(WVList))
+
+	for i, entry := range WVList {
+		WVListCSV[i] = make([]string, 5)
+		WVListCSV[i][0] = entry.Classifier
+		WVListCSV[i][1] = strconv.Itoa(entry.Number)
+		WVListCSV[i][2] = entry.Extra
+		WVListCSV[i][3] = entry.Title
+		WVListCSV[i][4] = entry.Incipit
+	}
+
+	buf2 := new(bytes.Buffer)
+
+	w2 := csv.NewWriter(buf2)
+	w2.WriteAll(WVListCSV)
+	if w2.Error() != nil {
+		return "csv notes write error: " + w2.Error().Error()
+	}
+
+	WVCsvFileName := strings.TrimRight(newJsonFile.Name(), ".json") + ".csv"
+	// note that this includes the directory, is a full relative path
+
+	WVCsvFile, err := os.Create(WVCsvFileName)
+	if err != nil {
+		return "wv entry csv file error: " + err.Error()
+	}
+	defer WVCsvFile.Close()
+
+	_, err = WVCsvFile.Write(buf2.Bytes())
+	if err != nil {
+		return "wv entry csv file write error: " + err.Error()
+	}
+
+	/*
+		Everything else having gone smoothly, change from .verified to .accepted
+		(do this via remarshalling)
+	*/
+	substr.SubmitEmail = ""
+
+	oldsubmissionfile := SubmissionsDirPath + submission.Name()
+	newsubmissionfile := oldsubmissionfile + ".accepted"
+	newSubmissionContents, err := json.Marshal(substr)
+	if err != nil {
+		return "submission file rename json error: " + err.Error() + "\nBut the submission acception was successful"
+	}
+	newsubmissionfilefile, err := os.Create(newsubmissionfile)
+	if err != nil {
+		return "submission file create error: " + err.Error() + "\nBut the submission acception was successful"
+	}
+	defer newsubmissionfilefile.Close()
+
+	_, err = newsubmissionfilefile.Write(newSubmissionContents)
+	if err != nil {
+		return "submission file move write to file error: " + err.Error() + "\nBut the submission acception was successful"
+	}
+
+	os.Remove(oldsubmissionfile)
+	stringssplit := strings.Split(oldsubmissionfile, ".")
+	os.Remove(strings.Join(stringssplit[:len(stringssplit)-1], ".") + ".password")
+
+	return "Acceptfully accepted."
+}
+
 func ExecuteAdminCommand(command string) string {
 	argvRaw := strings.Split(command, " ")
 
@@ -249,10 +423,12 @@ func ExecuteAdminCommand(command string) string {
 		return AdminListCommand(argv)
 	case "vsub":
 		return AdminViewSubmission(argv)
+	case "vs":
+		return AdminViewSubmission(argv) // alias to same command
 	case "vedit":
 		return "vedit"
-	case "accept":
-		return "accept"
+	case "asub":
+		return AdminAcceptSubmission(argv)
 	case "help":
 		fallthrough
 	default:
@@ -383,4 +559,9 @@ func MakePasswordHashCommand(password string) {
 	if len(password) == 0 {
 		fmt.Println()
 	}
+}
+
+func GetCurrentDateStr() string {
+	now := time.Now()
+	return now.Format("Jan 2, 2006")
 }

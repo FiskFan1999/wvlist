@@ -33,7 +33,7 @@ type Note struct {
 }
 
 type CurrentSingle struct {
-	ID            string
+	//ID            string
 	ComposerFirst string `json:"first"`
 	ComposerLast  string `json:"last"`
 	ComposerBirth int    `json:"birth"`
