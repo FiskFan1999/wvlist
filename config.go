@@ -16,6 +16,7 @@ type ConfigAdminInfo struct {
 
 type ConfigStr struct {
 	Name            string            `json:"name"`
+	Hostname        string            `json:"hostname"`
 	LilypondVersion string            `json:"lilypond_version"`
 	SmtpDestination string            `json:"smtp_destination"`
 	SmtpPort        int               `json:"smtp_port"`

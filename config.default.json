@@ -1,11 +1,20 @@
 {
     "name": "wvlist",
+    "hostname": "",
     "lilypond_version": "2.20.0",
     "smtp_destination": "",
     "smtp_port": 587,
     "smtp_username": "",
     "smtp_password": "",
     "smtp_adminbcc": [],
-    "admins": []
+    "admins": [],
+    "admins example": [
+        {
+            "name": "Full name here",
+            "email": "email@example.com",
+            "username": "username",
+            "hash": "$2a$10$xxxxxxxxxx (should be replaced by ./wvlist password)"
+        }
+    ]
 
 }

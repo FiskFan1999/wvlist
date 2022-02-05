@@ -90,7 +90,21 @@
                     type: "POST",
                     url: "/api/v1/uploadugly",
                     data: formData,
-                    success: function(){},
+                    success: function(result){
+                            console.log(result);
+                            if (result.status != "success" ) {
+                                    alert("Submission was not successful: " + result.message);
+                                    
+                                }
+                            else {
+                            alert("The submission was accepted. Thank you.");
+                            window.location='/'
+                                }
+                        },
+                    error: function (xhr, textStatus, errorThrown) { 
+                            console.error(textStatus + "\n" + errorThrown); 
+                            alert("Unfortunately, the server returned an error. Please send a screenshot of this page to admin@wvlist.net.");
+                        },
                     dataType: "json",
                     contentType: "application/json"
                 });

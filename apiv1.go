@@ -73,8 +73,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		//TODO: better submission accepting page
-		fmt.Fprintln(w, "Thank you for your submission")
+		http.Redirect(w, r, "/", 200)
 
 	case "uploadugly":
 		if r.Method != "POST" {
@@ -203,6 +202,17 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 		*/
 
 		go Apiv1SendSmtpEmailForSubmitUgly(sanitizedInputStr, fileIndex, verifyPassword)
+
+		w.Header().Set("Content-Type", "application/json")
+		resp := map[string]string{}
+		resp["status"] = "success"
+		resp["message"] = "Thank you for your submission."
+		respBytes, err := json.MarshalIndent(resp, "", "  ")
+		if err != nil {
+			fmt.Println("json marshal error" + err.Error())
+			return
+		}
+		w.Write(respBytes)
 
 		w.WriteHeader(201)
 

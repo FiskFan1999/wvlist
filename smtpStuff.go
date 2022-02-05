@@ -99,6 +99,7 @@ func SendTestSMTPEmail(to string) {
 type Apiv1SendSmtpEmailForSubmitUglyStr struct {
 	Config ConfigStr
 	Name   string
+	Email  string
 	Href   string
 }
 
@@ -119,7 +120,8 @@ func Apiv1SendSmtpEmailForSubmitUgly(san V1UploadUglySanitizedInput, fileIndex s
 	var a Apiv1SendSmtpEmailForSubmitUglyStr
 	a.Config = *FullConfig
 	a.Name = name
-	a.Href = "http://127.0.0.1:6060/api/v1/verify/" + fileIndex + "/" + password + "/"
+	a.Email = emailAddress
+	a.Href = FullConfig.Hostname + "/api/v1/verify/" + fileIndex + "/" + password + "/"
 	var buf bytes.Buffer
 	htmlTemplate.Execute(&buf, a)
 
