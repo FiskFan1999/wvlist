@@ -8,5 +8,5 @@ all:
 	go build -ldflags="-X main.Commit=$(GIT_COMMIT) -X main.Version=$(GIT_TAG)"
 clean:
 	rm -f ./wvlist
-deb:
+debug:
 	./wvlist -d -t 7070 -p 6060 run
