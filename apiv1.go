@@ -143,14 +143,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 				sanitizedInputStr.CompositionList[index].Classifier = value
 			case "number":
 				index := len(sanitizedInputStr.CompositionList) - 1
-				sanitizedInputStr.CompositionList[index].Number, err = strconv.Atoi(value)
-				if err != nil {
-					fmt.Println("BWV number error")
-					sanitizedInputStr.CompositionList[index].Number = -1
-				}
-			case "other":
-				index := len(sanitizedInputStr.CompositionList) - 1
-				sanitizedInputStr.CompositionList[index].Extra = value
+				sanitizedInputStr.CompositionList[index].Number = value
 			case "title":
 				index := len(sanitizedInputStr.CompositionList) - 1
 				sanitizedInputStr.CompositionList[index].Title = value

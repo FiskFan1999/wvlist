@@ -24,7 +24,11 @@ func ViewPage(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "404 Page not found.", 404)
 			fmt.Fprintln(w, err)
 			return
+		} else {
+			http.Error(w, err.Error(), 500)
+			return
 		}
+
 	}
 
 	tmp, err := template.ParseFiles("./template/view.html")

@@ -40,9 +40,6 @@
                         No.
                     </th>
                     <th>
-                        Other
-                    </th>
-                    <th>
                         Title
                     </th>
                     <th>
@@ -58,9 +55,6 @@
                         </td>
                         <td>
                             <input size=5 type="text" name="number" id="number">
-                        </td>
-                        <td>
-                            <input size=5 type="text" name="other" id="other">
                         </td>
                         <td>
                             <input size=30 type="text" name="title" id="title">
@@ -111,17 +105,15 @@
             cell1.innerHTML = "<input size=10 type=\"text\" name=\"classification\" id=\"classification\">";
             var cell2 = row.insertCell(1);
             cell2.innerHTML = '<input size=5 type="text" name="number" id="number">';
-            var cell3 = row.insertCell(2);
-            cell3.innerHTML = '<input size=5 type="text" name="other" id="other">';
-            var cell4 = row.insertCell(3);
+            var cell4 = row.insertCell(2);
             cell4.innerHTML = '<input size=30 type="text" name="title" id="title">';
-            var cell5 = row.insertCell(4);
+            var cell5 = row.insertCell(3);
             cell5.innerHTML = '<input size=20 type="text" name="incipit" id="incipit">';
-            var cell6 = row.insertCell(5);
+            var cell6 = row.insertCell(4);
             cell6.innerHTML = '<input type="button" value="Down" onclick="moveRowDown(this)">';
-            var cell7 = row.insertCell(6);
+            var cell7 = row.insertCell(5);
             cell7.innerHTML = '<input type="button" value="Up" onclick="moveRowUp(this)">';
-            var cell8 = row.insertCell(7);
+            var cell8 = row.insertCell(6);
             cell8.innerHTML = '<input type="button" value="Delete" onclick="deleteRow(this)">';
             }
         }

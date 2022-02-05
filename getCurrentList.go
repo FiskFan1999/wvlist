@@ -8,19 +8,17 @@ import (
 	"fmt"
 	"html"
 	"os"
-	"strconv"
 )
 
 type FullCurrentList []CurrentSingle
 
 const (
-	WVEntryRowLength = 5
+	WVEntryRowLength = 4
 )
 
 type WVEntry struct {
 	Classifier  string
-	Number      int
-	Extra       string
+	Number      string
 	Title       string
 	Incipit     string
 	IncipitHTML string
@@ -98,11 +96,10 @@ func ParseCurrentSingle(id string) (*CurrentSingle, error) {
 		fmt.Println(row)
 		var newEntry WVEntry
 		newEntry.Classifier = row[0]
-		newEntry.Number, err = strconv.Atoi(row[1])
-		newEntry.Extra = row[2]
-		newEntry.Title = row[3]
-		newEntry.Incipit = row[4]
-		newEntry.IncipitHTML = html.EscapeString(row[4])
+		newEntry.Number = row[1]
+		newEntry.Title = row[2]
+		newEntry.Incipit = row[3]
+		newEntry.IncipitHTML = html.EscapeString(row[3])
 
 		if err != nil {
 			return nil, errors.New("CSV: non-number found in column 1")

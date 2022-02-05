@@ -20,7 +20,6 @@ import (
 	"html/template"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -213,8 +212,7 @@ func AdminViewSubmission(argv []string) string {
 	for _, c := range substr.CompositionList {
 		//c is type WVEntry
 		fmt.Fprintf(buf, "%s,\t", c.Classifier)
-		fmt.Fprintf(buf, "%d,\t", c.Number)
-		fmt.Fprintf(buf, "%s,\t", c.Extra)
+		fmt.Fprintf(buf, "%s,\t", c.Number)
 		fmt.Fprintf(buf, "<t>%s</t>,\t", c.Title)
 		fmt.Fprintf(buf, "<i>%s</i>,\t", c.Incipit)
 
@@ -336,12 +334,11 @@ func AdminAcceptSubmission(argv []string) string {
 	WVListCSV := make([][]string, len(WVList))
 
 	for i, entry := range WVList {
-		WVListCSV[i] = make([]string, 5)
+		WVListCSV[i] = make([]string, WVEntryRowLength)
 		WVListCSV[i][0] = entry.Classifier
-		WVListCSV[i][1] = strconv.Itoa(entry.Number)
-		WVListCSV[i][2] = entry.Extra
-		WVListCSV[i][3] = entry.Title
-		WVListCSV[i][4] = entry.Incipit
+		WVListCSV[i][1] = entry.Number
+		WVListCSV[i][2] = entry.Title
+		WVListCSV[i][3] = entry.Incipit
 	}
 
 	buf2 := new(bytes.Buffer)
