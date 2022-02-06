@@ -57,7 +57,8 @@ func main() {
 		}
 		to := argv[1]
 		fmt.Println("Sending email to " + to)
-		SendTestSMTPEmail(to)
+		buf := SendTestSMTPEmail(to)
+		fmt.Println(buf.String())
 
 	case "run":
 		/*

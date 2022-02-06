@@ -12,7 +12,8 @@ import (
 	"time"
 )
 
-func SendSMTPEmail(too []string, subject string, html []byte, attachments ...string) {
+func SendSMTPEmail(too []string, subject string, html []byte, attachments ...string) (buf *bytes.Buffer) {
+	buf = new(bytes.Buffer)
 	var to []string
 	for _, addr := range too {
 		if CheckEmailCooldownUnsubscribe(addr) {
@@ -22,7 +23,7 @@ func SendSMTPEmail(too []string, subject string, html []byte, attachments ...str
 	if len(to) == 0 {
 		return
 	}
-	fmt.Println("SMTP: Sending email to", to, "subject", subject)
+	fmt.Fprintln(buf, "SMTP: Sending email to", to, "subject", subject)
 	em := email.NewEmail()
 	em.From = "server@wvlist.net"
 	em.To = to
@@ -36,10 +37,11 @@ func SendSMTPEmail(too []string, subject string, html []byte, attachments ...str
 	}
 	err := em.SendWithStartTLS(FullConfig.SmtpDestination+":"+strconv.Itoa(FullConfig.SmtpPort), smtp.PlainAuth("", FullConfig.SmtpUsername, FullConfig.SmtpPassword, FullConfig.SmtpDestination), &tls.Config{ServerName: FullConfig.SmtpDestination})
 	if err != nil {
-		fmt.Println("smtp error:", err.Error())
+		fmt.Fprintln(buf, "smtp error:", err.Error())
 	} else {
-		fmt.Println("email.SendWithStartTLS completed.")
+		fmt.Fprintln(buf, "email.SendWithStartTLS completed.")
 	}
+	return
 }
 
 var EmailCoolDown map[string]time.Time
@@ -76,11 +78,11 @@ func CheckEmailUnsibscribe(addr string) bool {
 	return true
 }
 
-func SendTestSMTPEmail(to string) {
+func SendTestSMTPEmail(to string) (buf *bytes.Buffer) {
 	/*
 		Used for debugging (./wvlist sendemail)
 	*/
-	SendSMTPEmail([]string{to}, "Test email from "+FullConfig.Name, []byte("Hello. This is a test email, sent via ./wvlist smtp. If this email is recieved, that means your SMTP settings are entered correctly."))
+	return SendSMTPEmail([]string{to}, "Test email from "+FullConfig.Name, []byte("Hello. This is a test email, sent via ./wvlist smtp. If this email is recieved, that means your SMTP settings are entered correctly."))
 	/*
 		em := email.NewEmail()
 		em.From = "server@wvlist.net"

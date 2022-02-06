@@ -426,11 +426,22 @@ func ExecuteAdminCommand(command string) string {
 		return "vedit"
 	case "asub":
 		return AdminAcceptSubmission(argv)
+	case "testemail":
+		return AdminTestEmail(argv)
 	case "help":
 		fallthrough
 	default:
 		return ADMINHELPMESSAGE
 	}
+}
+
+func AdminTestEmail(argv []string) string {
+	if len(argv) != 2 {
+		return "testemail <address> - send an email to test SMTP settings"
+	}
+
+	to := argv[1]
+	return SendTestSMTPEmail(to).String()
 }
 
 func FailAdminAuth(w http.ResponseWriter) {
@@ -470,6 +481,7 @@ func AdminConsole(w http.ResponseWriter, r *http.Request) {
 
 func AdminConsoleCheckAuth(w http.ResponseWriter, r *http.Request) bool {
 	u, p, ok := r.BasicAuth()
+	fmt.Println(u, p, ok)
 
 	if !ok {
 		FailAdminAuth(w)
