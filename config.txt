@@ -5,6 +5,9 @@ instance, this is "wvlist.net"
 > "lilypond_version": string/"2.20.0"
 The version of lilypond which is installed in the system. Note that this value is inserted into the lilypond template, "\version "2.20.0".
 
+> "lilypond_timeout": string
+The length of time at which point lilypond will automatically time out and fail to render the image. Used to protect against some spam attacks. Should be written in the format "10s" where s = seconds. (See go pkg time.ParseDuration)
+
 > "smtp_destination": string
 Hostname of the SMTP server that is being used. (For example, email-smtp.eu-west-1.amazonaws.com)
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"time"
 )
 
 type ConfigAdminInfo struct {
@@ -15,9 +16,11 @@ type ConfigAdminInfo struct {
 }
 
 type ConfigStr struct {
-	Name            string            `json:"name"`
-	Hostname        string            `json:"hostname"`
-	LilypondVersion string            `json:"lilypond_version"`
+	Name            string `json:"name"`
+	Hostname        string `json:"hostname"`
+	LilypondVersion string `json:"lilypond_version"`
+	LilypondTimeout string `json:"lilypond_timeout"`
+	LilyTimeStr     time.Duration
 	SmtpDestination string            `json:"smtp_destination"`
 	SmtpPort        int               `json:"smtp_port"`
 	SmtpUsername    string            `json:"smtp_username"`
@@ -53,7 +56,15 @@ func RehashConfig() error {
 		return err
 	}
 
-	return json.Unmarshal(contents, FullConfig)
+	if err = json.Unmarshal(contents, FullConfig); err != nil {
+		return err
+	}
+
+	FullConfig.LilyTimeStr, err = time.ParseDuration(FullConfig.LilypondTimeout)
+	if err != nil {
+		return err
+	}
+	return nil
 
 }
 

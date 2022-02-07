@@ -2,6 +2,7 @@
     "name": "wvlist",
     "hostname": "",
     "lilypond_version": "2.20.0",
+    "lilypond_timeout": "10s",
     "smtp_destination": "",
     "smtp_port": 587,
     "smtp_username": "",
