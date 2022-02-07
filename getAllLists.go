@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -48,6 +49,11 @@ func GetAllLists() (FullIndexList []FullListIndex) {
 		TODO: sort these alphabetically by .Name (will not be
 		alphabetically sorted)
 	*/
+
+	// Sort by alphabetical name
+	sort.SliceStable(FullIndexList, func(i, j int) bool {
+		return strings.ToLower(FullIndexList[i].Name) < strings.ToLower(FullIndexList[j].Name)
+	})
 
 	return
 }
