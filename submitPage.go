@@ -5,9 +5,22 @@ import (
 	"net/http"
 )
 
+const (
+	HowManyRowsToAddAtATime = 10
+	DownChar                = "↓"
+	UpChar                  = "↑"
+	InsertChar              = "*"
+	DeleteChar              = "x"
+)
+
 type SubmitPageTemplateInput struct {
 	Config            ConfigStr
 	SubmissionMessage string
+	Rows              uint
+	Down              string
+	Up                string
+	Insert            string
+	Delete            string
 }
 
 func SubmitPage(w http.ResponseWriter, r *http.Request) {
@@ -28,6 +41,11 @@ func SubmitPage(w http.ResponseWriter, r *http.Request) {
 	var inp SubmitPageTemplateInput
 	inp.Config = *FullConfig
 	inp.SubmissionMessage = "sub message here"
+	inp.Rows = HowManyRowsToAddAtATime
+	inp.Up = UpChar
+	inp.Down = DownChar
+	inp.Insert = InsertChar
+	inp.Delete = DeleteChar
 
 	tmp.Execute(w, inp)
 }
