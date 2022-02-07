@@ -226,7 +226,6 @@ func SendJSONSuccessOrErrorMessage(w http.ResponseWriter, success bool, message 
 	respBytes, err := json.MarshalIndent(resp, "", "  ")
 	if err != nil {
 		panic("json marshal error" + err.Error())
-		return
 	}
 	w.Write(respBytes)
 
