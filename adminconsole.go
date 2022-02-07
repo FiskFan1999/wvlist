@@ -499,7 +499,6 @@ func AdminConsole(w http.ResponseWriter, r *http.Request) {
 
 func AdminConsoleCheckAuth(w http.ResponseWriter, r *http.Request) bool {
 	u, p, ok := r.BasicAuth()
-	fmt.Println(u, p, ok)
 
 	if !ok {
 		FailAdminAuth(w)
