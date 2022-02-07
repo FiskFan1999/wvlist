@@ -57,6 +57,9 @@ func AdminListCommand(argv []string) string {
 		return err.Error()
 	}
 
+	var allVerified uint = 0
+	var allUnverified uint = 0
+
 	var listOfSubmissions []os.DirEntry
 
 	for _, file := range allFiles {
@@ -67,12 +70,25 @@ func AdminListCommand(argv []string) string {
 		*/
 		name := file.Name()
 
-		if strings.HasSuffix(name, ".verified") || (showUnverified && strings.HasSuffix(name, ".unverified")) {
+		isVerified := strings.HasSuffix(name, ".verified")
+		isUnverified := strings.HasSuffix(name, ".unverified")
+
+		if isVerified || (showUnverified && isUnverified) {
 			listOfSubmissions = append(listOfSubmissions, file)
+		}
+		if isVerified {
+			allVerified++
+		}
+		if isUnverified {
+			allUnverified++
 		}
 	}
 
 	output := new(bytes.Buffer)
+
+	fmt.Fprintln(output, allVerified+allUnverified, "total submissions")
+	fmt.Fprintln(output, allVerified, "verified")
+	fmt.Fprintln(output, allUnverified, "unverified")
 
 	for _, sub := range listOfSubmissions {
 		/*
