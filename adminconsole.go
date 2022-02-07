@@ -32,7 +32,9 @@ const (
 ls - list all verified submissions
 vsub <id> - View a submission
 vedit <id> - View an edit
-asub <id> - Accept a submission`
+asub <id> - Accept a submission
+testemail <address> - Send an email to test SMTP settings
+help - list all available commands`
 )
 
 type AdminConsoleOutput struct {
