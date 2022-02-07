@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"github.com/jordan-wright/email"
 	"html/template"
@@ -12,16 +13,21 @@ import (
 	"time"
 )
 
-func SendSMTPEmail(too []string, subject string, html []byte, attachments ...string) (buf *bytes.Buffer) {
+func SendSMTPEmail(too []string, subject string, html []byte, attachments ...string) (buf *bytes.Buffer, err error) {
 	buf = new(bytes.Buffer)
 	var to []string
+	var failed []string
 	for _, addr := range too {
 		if CheckEmailCooldownUnsubscribe(addr) {
 			to = append(to, addr)
+		} else {
+			failed = append(failed, addr)
 		}
 	}
 	if len(to) == 0 {
-		return
+		errorbuf := new(bytes.Buffer)
+		fmt.Fprintf(errorbuf, "email(s) %s are on cooldown. No emails have been sent. Please try again in a little bit.", strings.Join(failed, ", "))
+		return nil, errors.New(errorbuf.String())
 	}
 	fmt.Fprintln(buf, "SMTP: Sending email to", to, "subject", subject)
 	em := email.NewEmail()
@@ -35,7 +41,7 @@ func SendSMTPEmail(too []string, subject string, html []byte, attachments ...str
 	for _, att := range attachments {
 		em.AttachFile(att)
 	}
-	err := em.SendWithStartTLS(FullConfig.SmtpDestination+":"+strconv.Itoa(FullConfig.SmtpPort), smtp.PlainAuth("", FullConfig.SmtpUsername, FullConfig.SmtpPassword, FullConfig.SmtpDestination), &tls.Config{ServerName: FullConfig.SmtpDestination})
+	err = em.SendWithStartTLS(FullConfig.SmtpDestination+":"+strconv.Itoa(FullConfig.SmtpPort), smtp.PlainAuth("", FullConfig.SmtpUsername, FullConfig.SmtpPassword, FullConfig.SmtpDestination), &tls.Config{ServerName: FullConfig.SmtpDestination})
 	if err != nil {
 		fmt.Fprintln(buf, "smtp error:", err.Error())
 	} else {
@@ -78,11 +84,12 @@ func CheckEmailUnsibscribe(addr string) bool {
 	return true
 }
 
-func SendTestSMTPEmail(to string) (buf *bytes.Buffer) {
+func SendTestSMTPEmail(to string) *bytes.Buffer {
 	/*
 		Used for debugging (./wvlist sendemail)
 	*/
-	return SendSMTPEmail([]string{to}, "Test email from "+FullConfig.Name, []byte("Hello. This is a test email, sent via ./wvlist smtp. If this email is recieved, that means your SMTP settings are entered correctly."))
+	text, _ := SendSMTPEmail([]string{to}, "Test email from "+FullConfig.Name, []byte("Hello. This is a test email, sent via ./wvlist smtp. If this email is recieved, that means your SMTP settings are entered correctly."))
+	return text
 	/*
 		em := email.NewEmail()
 		em.From = "server@wvlist.net"
@@ -105,7 +112,7 @@ type Apiv1SendSmtpEmailForSubmitUglyStr struct {
 	Href   string
 }
 
-func Apiv1SendSmtpEmailForSubmitUgly(san V1UploadUglySanitizedInput, fileIndex string, password string) {
+func Apiv1SendSmtpEmailForSubmitUgly(san V1UploadUglySanitizedInput, fileIndex string, password string) error {
 	/*
 		TO DO
 	*/
@@ -117,7 +124,7 @@ func Apiv1SendSmtpEmailForSubmitUgly(san V1UploadUglySanitizedInput, fileIndex s
 	htmlTemplate, err := template.ParseFiles("template/apiv1submissionemail.html")
 	if err != nil {
 		fmt.Println("htmlTemplate for email error", err.Error())
-		return
+		return errors.New("Internal SMTP server error.")
 	}
 	var a Apiv1SendSmtpEmailForSubmitUglyStr
 	a.Config = *FullConfig
@@ -127,6 +134,7 @@ func Apiv1SendSmtpEmailForSubmitUgly(san V1UploadUglySanitizedInput, fileIndex s
 	var buf bytes.Buffer
 	htmlTemplate.Execute(&buf, a)
 
-	SendSMTPEmail([]string{emailAddress}, "Submission", buf.Bytes())
+	_, err = SendSMTPEmail([]string{emailAddress}, "Submission", buf.Bytes())
+	return err
 
 }
