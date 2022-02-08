@@ -27,12 +27,14 @@ import (
 const (
 	BCRYPTCOST         = 10
 	SubmissionsDirPath = "./submissions/"
+	RemovedEmailStr    = ""
 
 	ADMINHELPMESSAGE = `Available commands:
 ls - list all verified submissions
 vsub <id> - View a submission
 vedit <id> - View an edit
 asub <id> - Accept a submission
+rsub <id> - Reject a submission
 testemail <address> - Send an email to test SMTP settings
 help - list all available commands`
 )
@@ -444,6 +446,8 @@ func ExecuteAdminCommand(command string) string {
 		return "vedit"
 	case "asub":
 		return AdminAcceptSubmission(argv)
+	case "rsub":
+		return AdminRejectSubmission(argv)
 	case "testemail":
 		return AdminTestEmail(argv)
 	case "help":
@@ -451,6 +455,70 @@ func ExecuteAdminCommand(command string) string {
 	default:
 		return ADMINHELPMESSAGE
 	}
+}
+
+func AdminRejectSubmission(argv []string) string {
+	id := argv[1]
+	submissionp, errorMessage := AdminGetSubmissionFromSnippet(id)
+	if errorMessage != "" {
+		return errorMessage
+	}
+
+	submission := *submissionp
+
+	/*
+		Rewrite .verified or .unverified file to .rejected (remove email)
+	*/
+
+	filename := SubmissionsDirPath + submission.Name()
+	origContents, err := os.ReadFile(filename)
+	if err != nil {
+		return err.Error()
+	}
+
+	input := new(V1UploadUglySanitizedInput)
+	if err = json.Unmarshal(origContents, input); err != nil {
+		return err.Error()
+	}
+
+	// remove email
+	input.SubmitEmail = RemovedEmailStr
+
+	output, err := json.MarshalIndent(input, "", "  ")
+	if err != nil {
+		return err.Error()
+	}
+
+	OFNS := strings.Split(filename, ".")
+	outputFileName := strings.Join(OFNS[0:len(OFNS)-1], ".") + ".rejected"
+
+	outFileStr, err := os.Create(outputFileName)
+	if err != nil {
+		return err.Error()
+	}
+
+	if _, err = outFileStr.Write(output); err != nil {
+		return err.Error()
+	}
+
+	/*
+		If new file is successfully writte, remove original file
+	*/
+
+	if err = os.Remove(filename); err != nil {
+		return err.Error()
+	}
+	// also remove password file
+
+	passwordFileName := strings.Join(OFNS[0:len(OFNS)-1], ".") + ".password"
+	if err = os.Remove(passwordFileName); err != nil {
+		return err.Error()
+	}
+
+	buf := new(bytes.Buffer)
+	fmt.Fprintf(buf, "Submission %s successfully rejected.", filename)
+	return buf.String()
+
 }
 
 func AdminTestEmail(argv []string) string {
