@@ -28,7 +28,7 @@
                 <li><a href="/view/{{.Path}}">{{.Name}}</a></li>
                 {{ end }}
             </ul>
-            <span>Running wvlist {{.Config.Version }} ({{.Config.Commit}})</span>
+            <span style="font-family: monospace;">Running wvlist {{.Config.Version }} <a href="{{.CommitHTML}}">{{ .CommitSnippet }}</a></span>
         </div>
     </body>
 </html>
