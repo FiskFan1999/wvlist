@@ -19,11 +19,13 @@ type HomepageMenuContentSingle struct {
 //type FullHomepageMenuContents []HomepageMenuContentSingle
 
 type HomePageTemplateInput struct {
-	List       []FullListIndex
-	Config     ConfigStr
-	Name       string
-	Table      []HomepageMenuContentSingle
-	SearchTerm string
+	List          []FullListIndex
+	Config        ConfigStr
+	Name          string
+	Table         []HomepageMenuContentSingle
+	SearchTerm    string
+	CommitHTML    string
+	CommitSnippet string
 }
 
 func HomePage(w http.ResponseWriter, r *http.Request) {
@@ -42,6 +44,7 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 	inp.Config = *FullConfig
 	inp.List = fullList
 	inp.Table = GetHomePageMenuContents()
+	inp.CommitHTML, inp.CommitSnippet = GetLinkToCommitInRepositry(FullConfig.Commit)
 
 	/*
 		Parse search and if there is a searched query,
