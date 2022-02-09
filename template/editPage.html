@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/style.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <a href="/">Go home</a>
+            <h1 >{{ .ComposerFirst }} {{.ComposerLast}} ({{ .ComposerBirth}}-{{if ne .ComposerDeath 0}}{{.ComposerDeath}}{{end}})</h1>
+            <form id="composer">
+                    <textarea rows="3" cols="40" name="notes" placeholder="Notes about composer, information about sources, etc." id="notes"></textarea>
+                    <h4>Author of Submission</h4>
+                    <label for="submitname">Submitter's name</label>
+                    <input type="text" size=30 name="submitname" placeholder="Leave blank for anonymous" id="submitname">
+                    <br><label for="email">Verification Email</label>
+                    <input type="email" placeholder="optional" name="email" id="email">
+                    <p><span style="font-style:italic;">Note about email: </span>Your email will be used to send a verification link, and it will be saved while I verify your submission, and when it has been accepted your email address will be discarded.</p>
+                <h3>Compositions</h3>
+                <table id="compositiontable">
+                <tr>
+                    <th>
+                        <abbr title="Title of classification. For example, Opus, BWV, K, etc.">Class.</abbr>
+                    </th>
+                    <th>
+                        No.
+                    </th>
+                    <th>
+                        Title
+                    </th>
+                    <th>
+                        Incipit
+                    </th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                {{ range .WVList }}
+                    <tr>
+                        <td>
+                            <input value="{{ .Classifier }}" size=10 type="text" name="classification" id="classification">
+                        </td>
+                        <td>
+                            <input value="{{ .Number }}" size=5 type="text" name="number" id="number">
+                        </td>
+                        <td>
+                            <input value="{{ .Title }}" size=30 type="text" name="title" id="title">
+                        </td>
+                        <td>
+                            <input value="{{ .Incipit }}" size=20 type="text" name="incipit" id="incipit">
+                        </td>
+                        <td>
+                            <input type="button" value="{{$.Down }}" onclick="moveRowDown(this)">
+                        </td>
+                        <td>
+                            <input type="button" value="{{ $.Up }}" onclick="moveRowUp(this)">
+                        </td>
+                        <td>
+                            <input type="button" value="{{ $.Insert }}" onclick="insertRow(this)">
+                        </td>
+                        <td>
+                            <input type="button" value="{{ $.Delete }}" onclick="deleteRow(this)">
+                        </td>
+                    </tr>
+                {{ end }}
+                </table>
+                <input type=button value="Add more rows{{ if ne .Rows 1 }} x{{ .Rows}}{{ end}}" onclick="addRows()">
+                <input type="button" value="Submit" onclick="makeSubmission()">
+
+            </form>
+        </div>
+<script type="text/javascript">
+    function makeSubmission() {
+            if (false === confirm("Are you sure you want to submit?")) {
+                    return false;
+                }
+
+            var formData = JSON.stringify($("#composer").serializeArray());
+            console.log(formData);
+            $.ajax({
+                    type: "POST",
+                    url: "/api/v1/uploadeditugly/{{ .ID }}",
+                    data: formData,
+                    success: function(result){
+                            console.log(result);
+                            if (result.status != "success" ) {
+                                    alert("Submission was not successful: " + result.message);
+                                    
+                                }
+                            else {
+                            alert("The submission was accepted. Thank you.");
+                            window.location='/'
+                                }
+                        },
+                    error: function (xhr, textStatus, errorThrown) { 
+                            console.error(textStatus + "\n" + errorThrown); 
+                            alert("Unfortunately, the server returned an error. Please send a screenshot of this page to admin@wvlist.net.");
+                        },
+                    dataType: "json",
+                    contentType: "application/json"
+                });
+        }
+
+    function addRows() {
+            // insertRows(-1) appends row
+            for (var i = 0; i < {{ $.Rows }}; i++) {
+            var table = document.getElementById("compositiontable");
+            var row = table.insertRow(-1);
+            var cell1 = row.insertCell(0);
+            cell1.innerHTML = "<input size=10 type=\"text\" name=\"classification\" id=\"classification\">";
+            var cell2 = row.insertCell(1);
+            cell2.innerHTML = '<input size=5 type="text" name="number" id="number">';
+            var cell4 = row.insertCell(2);
+            cell4.innerHTML = '<input size=30 type="text" name="title" id="title">';
+            var cell5 = row.insertCell(3);
+            cell5.innerHTML = '<input size=20 type="text" name="incipit" id="incipit">';
+            var cell6 = row.insertCell(4);
+            cell6.innerHTML = '<input type="button" value="{{$.Down}}" onclick="moveRowDown(this)">';
+            var cell7 = row.insertCell(5);
+            cell7.innerHTML = '<input type="button" value="{{$.Up}}" onclick="moveRowUp(this)">';
+            var cell8 = row.insertCell(6);
+            cell8.innerHTML = '<input type="button" value="{{$.Insert}}" onclick="insertRow(this)">';
+            var cell9 = row.insertCell(7);
+            cell9.innerHTML = '<input type="button" value="{{ $.Delete }}" onclick="deleteRow(this)">';
+            }
+        }
+    function moveRowUp(r){
+            var row = $(r).parents("tr:first");
+            var index = r.parentNode.parentNode.rowIndex;
+            if (index < 2){
+                    return
+                }
+            row.insertBefore(row.prev());
+        }
+    function moveRowDown(r){
+            var row = $(r).parents("tr:first");
+            row.insertAfter(row.next());
+        }
+    function insertRow(r){
+            var rownumber = r.parentNode.parentNode.rowIndex;
+            var table = document.getElementById("compositiontable");
+            var row = table.insertRow(rownumber);
+            var cell1 = row.insertCell(0);
+            cell1.innerHTML = "<input size=10 type=\"text\" name=\"classification\" id=\"classification\">";
+            var cell2 = row.insertCell(1);
+            cell2.innerHTML = '<input size=5 type="text" name="number" id="number">';
+            var cell4 = row.insertCell(2);
+            cell4.innerHTML = '<input size=30 type="text" name="title" id="title">';
+            var cell5 = row.insertCell(3);
+            cell5.innerHTML = '<input size=20 type="text" name="incipit" id="incipit">';
+            var cell6 = row.insertCell(4);
+            cell6.innerHTML = '<input type="button" value="{{ .Down }}" onclick="moveRowDown(this)">';
+            var cell7 = row.insertCell(5);
+            cell7.innerHTML = '<input type="button" value="{{ .Up }}" onclick="moveRowUp(this)">';
+            var cell8 = row.insertCell(6);
+            cell8.innerHTML = '<input type="button" value="{{ .Insert }}" onclick="insertRow(this)">';
+            var cell9 = row.insertCell(7);
+            cell9.innerHTML = '<input type="button" value="{{ .Delete}}" onclick="deleteRow(this)">';
+
+        }
+    function deleteRow(r){
+            var index = r.parentNode.parentNode.rowIndex;
+            document.getElementById("compositiontable").deleteRow(index);
+        }
+</script>
+    </body>
+</html>

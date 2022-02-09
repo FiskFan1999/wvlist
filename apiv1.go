@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 )
@@ -21,6 +24,22 @@ type V1UploadUglySanitizedInput struct {
 	SubmitName      string
 	SubmitEmail     string
 	CompositionList []WVEntry
+}
+
+type V1UploadEditUglyBodyInput struct {
+	ID              string
+	Notes           string
+	SubmitName      string
+	SubmitEmail     string
+	CompositionList [][]string
+}
+
+type V1UploadEditUglyBodyOutput struct {
+	ID          string
+	Notes       string
+	SubmitName  string
+	SubmitEmail string
+	Diff        []byte
 }
 
 func APIv1Handler(w http.ResponseWriter, r *http.Request) {
@@ -208,6 +227,248 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 		}
 		SendJSONSuccessMessage(w, "Thank you for your submission.")
 
+	case "uploadeditugly":
+		if r.Method != "POST" {
+			SendJSONSuccessOrErrorMessage(w, false, "405 Only POST method is allowed", 405)
+			return
+		}
+		if len(argv) != 1 {
+			SendJSONErrorMessage(w, "400 Bad Request (required syntax /api/v1/uploadeditugly/ID)")
+			return
+		}
+
+		id := argv[0]
+		fmt.Println("id", id)
+
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			SendJSONErrorMessage(w, "Error while reading POST body")
+		}
+		fmt.Println(string(body))
+
+		bodyUnm := new([]map[string]string)
+		err = json.Unmarshal(body, bodyUnm)
+		if err != nil {
+			SendJSONErrorMessage(w, "Error while unmarshaling POST body")
+			return
+		}
+		var eug V1UploadEditUglyBodyInput
+		eug.ID = id
+
+		/*
+			Iterate through the slice of [string]string
+			maps and fill in the information appropriately
+		*/
+
+		ccclea := func() bool {
+			/*
+				Check for composition list empty array
+
+				return TRUE if the length is EQUAL TO 0 (would panic)
+				return FALSE if the length is NOT equal to 0 (fine)
+
+			*/
+			return len(eug.CompositionList) == 0
+		}
+
+		var clCurrentRow int = -1
+		/*
+			clCurrentRow:
+			which index of eug.CompositionList to add elements
+			add one each time a slice is appended to [][]string.
+			should be equal to len(eug.CompositionList) - 1.
+		*/
+
+		for _, keyvalue := range *bodyUnm {
+			key, kok := keyvalue["name"]
+			value, vok := keyvalue["value"]
+			if !kok || !vok {
+				SendJSONErrorMessage(w, "Error: one item in serialized array does not contain \"name\" and \"value\" keys.")
+				return
+			}
+
+			switch key {
+			case "notes":
+				if eug.Notes != "" {
+					SendJSONErrorMessage(w, "Error: Notes key specified multiple times.")
+					return
+				}
+				eug.Notes = value
+
+			case "submitname":
+				if eug.SubmitName != "" {
+					SendJSONErrorMessage(w, "Error: submitname key specified multiple times.")
+					return
+				}
+				eug.SubmitName = value
+
+			case "email":
+				if eug.SubmitEmail != "" {
+					SendJSONErrorMessage(w, "Error: email key specified multiple times.")
+					return
+				}
+				eug.SubmitEmail = value
+
+			case "classification":
+				// first in each line, append a new row.
+
+				eug.CompositionList = append(eug.CompositionList, make([]string, WVEntryRowLength))
+				clCurrentRow++
+
+				eug.CompositionList[clCurrentRow][0] = value
+
+			case "number":
+				if ccclea() {
+					SendJSONErrorMessage(w, "Error: illegal POST syntax: number declared but no classification")
+					return
+				}
+
+				if eug.CompositionList[clCurrentRow][1] != "" {
+					SendJSONErrorMessage(w, "Error: number key specified multiple times for same row.")
+					return
+				}
+
+				eug.CompositionList[clCurrentRow][1] = value
+
+			case "title":
+				if ccclea() {
+					SendJSONErrorMessage(w, "Error: illegal POST syntax: title declared but no classification")
+					return
+				}
+
+				if eug.CompositionList[clCurrentRow][2] != "" {
+					SendJSONErrorMessage(w, "Error: title key specified multiple times for same row.")
+					return
+				}
+
+				eug.CompositionList[clCurrentRow][2] = value
+
+			case "incipit":
+				if ccclea() {
+					SendJSONErrorMessage(w, "Error: illegal POST syntax: incipit declared but no classification")
+					return
+				}
+
+				if eug.CompositionList[clCurrentRow][3] != "" {
+					SendJSONErrorMessage(w, "Error: title key specified multiple times for same row.")
+					return
+				}
+
+				eug.CompositionList[clCurrentRow][3] = value
+
+			default:
+				/*
+					Unknown key passed, fail.
+				*/
+				SendJSONErrorMessage(w, "Unknown key in serialized array passed.")
+				return
+
+			} // end of switch state
+		}
+
+		fmt.Printf("%+v\n", eug)
+
+		/*
+			Marshal the [][]string eug.CompositionList into
+			a bytes.Buffer of csv, which will be compared
+			against the already existing csv to make a diff
+
+		*/
+
+		buf := new(bytes.Buffer)
+
+		writer := csv.NewWriter(buf)
+		writer.WriteAll(eug.CompositionList)
+		if writer.Error() != nil {
+			SendJSONErrorMessage(w, "csv write error: "+writer.Error().Error())
+			return
+		}
+
+		// write this to a temp file
+
+		tmpFileNewSub, err := os.CreateTemp("", "*.csv")
+		defer os.Remove(tmpFileNewSub.Name())
+		if err != nil {
+			SendJSONErrorMessage(w, "csv temp file error: "+err.Error())
+			return
+		}
+
+		_, err = tmpFileNewSub.Write(buf.Bytes())
+		tmpFileNewSub.Close()
+		if err != nil {
+			SendJSONErrorMessage(w, "csv temp file error: "+err.Error())
+			return
+		}
+
+		/*
+			Read from the original CSV file to make the diff
+		*/
+
+		originalSubmissionCSVFilename := "./current/" + eug.ID + ".csv"
+		newSubmissionCSVFilename := tmpFileNewSub.Name()
+		fmt.Println(originalSubmissionCSVFilename, newSubmissionCSVFilename)
+
+		// compute the diff between these two files
+
+		cmd := APIV1EditUglyGetDiff(originalSubmissionCSVFilename, newSubmissionCSVFilename)
+		output, _ := cmd.CombinedOutput()
+		fmt.Println(string(output))
+
+		/*
+			// note, diff seems to exit code 1 when showing the diff
+			if err != nil {
+				SendJSONErrorMessage(w, "Error while calculating diff: "+err.Error())
+				return
+			}
+		*/
+
+		/*
+			Write all this to a new output struct and marshall that to a file to be read
+			later.
+		*/
+
+		var out V1UploadEditUglyBodyOutput
+
+		out.SubmitName = eug.SubmitName
+		out.SubmitEmail = eug.SubmitEmail
+		out.ID = eug.ID
+		out.Notes = eug.Notes
+		out.Diff = output
+
+		file, err := os.CreateTemp("./submissions", "edit.*.unverified")
+		if err != nil {
+			fmt.Println(err.Error())
+			SendJSONInternalErrorMessage(w, "500 Internal server error: "+err.Error())
+			return
+		}
+		defer file.Close()
+
+		b, err := json.MarshalIndent(out, "", "  ")
+		if err != nil {
+			SendJSONInternalErrorMessage(w, "500 Internal server error: "+err.Error())
+			return
+		}
+		fmt.Println(string(b))
+
+		_, err = file.Write(b)
+		if err != nil {
+			SendJSONInternalErrorMessage(w, "500 Internal server error: "+err.Error())
+			return
+		}
+
+		// write password
+		fileNoEnding := strings.TrimRight(file.Name(), ".unverified")
+		verifyPassword := randstr.Hex(16)
+		fmt.Println("password", (verifyPassword))
+		passwordFilename := fileNoEnding + ".password"
+		err = os.WriteFile(passwordFilename, []byte(verifyPassword), 0666)
+		if err != nil {
+			fmt.Println("password file error", err.Error())
+			SendJSONInternalErrorMessage(w, "500 Internal server error (password file): "+err.Error())
+			return
+		}
+
+		SendJSONErrorMessage(w, "Hello, this hasn't been made yet!")
 	default:
 		http.Error(w, "404 Not Found", 404)
 		return
@@ -228,8 +489,8 @@ func SendJSONSuccessOrErrorMessage(w http.ResponseWriter, success bool, message 
 		panic("json marshal error" + err.Error())
 	}
 	w.Write(respBytes)
+	//w.WriteHeader(status)
 
-	w.WriteHeader(status)
 }
 
 func SendJSONInternalErrorMessage(w http.ResponseWriter, message string) {
@@ -300,4 +561,8 @@ func UploadUglyCheckForCorrectPostBody(body []map[string]string) error {
 	}
 
 	return nil
+}
+
+func APIV1EditUglyGetDiff(original, edited string) *exec.Cmd {
+	return exec.Command("diff", original, edited)
 }

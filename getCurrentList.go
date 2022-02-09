@@ -31,6 +31,13 @@ type Note struct {
 }
 
 type CurrentSingle struct {
+	Down   string
+	Up     string
+	Insert string
+	Delete string
+	Rows   int
+
+	ID            string // used for edit page
 	ComposerFirst string `json:"first"`
 	ComposerLast  string `json:"last"`
 	ComposerBirth int    `json:"birth"`
@@ -73,6 +80,8 @@ func ParseCurrentSingle(id string) (*CurrentSingle, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	ComposerInfo.ID = id
 
 	var CSVList [][]string
 	CSVList, err = csv.NewReader(bytes.NewReader(fileList)).ReadAll()
@@ -134,6 +143,16 @@ func ParseCurrentSingle(id string) (*CurrentSingle, error) {
 	ComposerInfo.Notes = allNotes
 
 	fmt.Println(fileNotes, ComposerInfo)
+
+	/*
+		Add up down insert and delete chars for the edit page
+	*/
+
+	ComposerInfo.Up = UpChar
+	ComposerInfo.Down = DownChar
+	ComposerInfo.Insert = InsertChar
+	ComposerInfo.Delete = DeleteChar
+	ComposerInfo.Rows = HowManyRowsToAddAtATime
 
 	return &ComposerInfo, nil
 }

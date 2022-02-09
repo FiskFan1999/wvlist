@@ -82,6 +82,9 @@ func main() {
 		pmux.HandleFunc("/submit/", SubmitPage)
 		tmux.HandleFunc("/submit/", SubmitPage)
 
+		pmux.HandleFunc("/edit/", GetEditPage)
+		tmux.HandleFunc("/edit/", GetEditPage)
+
 		pmux.HandleFunc("/lilysand/", LilypondSandbox)
 		tmux.HandleFunc("/lilysand/", LilypondSandbox)
 

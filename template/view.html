@@ -19,6 +19,8 @@
             <div>
                 <h4 style="margin:2px;">{{.Lock}}</h4>
             </div>
+            {{ else }}
+            <a href="/edit/{{ .ID }}">Edit this page</a>
             {{ end }}
             <table id="tablej">
                 <tr>
