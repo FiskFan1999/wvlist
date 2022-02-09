@@ -162,13 +162,13 @@
             var cell5 = row.insertCell(3);
             cell5.innerHTML = '<input size=20 type="text" name="incipit" id="incipit">';
             var cell6 = row.insertCell(4);
-            cell6.innerHTML = '<input type="button" value="Do." onclick="moveRowDown(this)">';
+            cell6.innerHTML = '<input type="button" value="{{ .Down }}" onclick="moveRowDown(this)">';
             var cell7 = row.insertCell(5);
-            cell7.innerHTML = '<input type="button" value="Up" onclick="moveRowUp(this)">';
+            cell7.innerHTML = '<input type="button" value="{{ .Up }}" onclick="moveRowUp(this)">';
             var cell8 = row.insertCell(6);
-            cell8.innerHTML = '<input type="button" value="Ins." onclick="insertRow(this)">';
+            cell8.innerHTML = '<input type="button" value="{{ .Insert }}" onclick="insertRow(this)">';
             var cell9 = row.insertCell(7);
-            cell9.innerHTML = '<input type="button" value="Del." onclick="deleteRow(this)">';
+            cell9.innerHTML = '<input type="button" value="{{ .Delete }}" onclick="deleteRow(this)">';
 
         }
     function deleteRow(r){
