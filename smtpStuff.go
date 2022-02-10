@@ -105,6 +105,42 @@ func SendTestSMTPEmail(to string) *bytes.Buffer {
 	*/
 }
 
+type Apiv1SentSmtpEmailForEditUglyStr struct {
+	Config ConfigStr
+	Name   string
+	Email  string
+	Href   string
+}
+
+func Apiv1SentSmtpEmailForEditUgly(name, email, id, password string) error {
+	fmt.Println("Sending email to", name, "at", email)
+	var san Apiv1SentSmtpEmailForEditUglyStr
+	san.Config = *FullConfig
+	san.Name = name
+	san.Email = email
+	san.Href = FullConfig.Hostname + "/api/v1/verifyedit/" + id + "/" + password + "/"
+
+	/*
+		Execute template
+	*/
+
+	buf := new(bytes.Buffer)
+
+	tmp, err := template.ParseFiles("./template/apiv1editemail.html")
+	if err != nil {
+		return err
+	}
+
+	err = tmp.Execute(buf, san)
+	if err != nil {
+		return err
+	}
+
+	_, err = SendSMTPEmail([]string{email}, "Edit submission", buf.Bytes())
+
+	return err
+}
+
 type Apiv1SendSmtpEmailForSubmitUglyStr struct {
 	Config ConfigStr
 	Name   string

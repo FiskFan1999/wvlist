@@ -95,6 +95,51 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/", 200)
 
+	case "verifyedit":
+		if len(argv) != 2 {
+			http.Error(w, "Bad request: usage /api/v1/verify/<id>/<password>", 400)
+			return
+		}
+		id := argv[0]
+		password := argv[1]
+
+		BadRequestMessage := "Bad Request: This submission already verified, submission file not found, or password incorrect"
+		fmt.Println(BadRequestMessage)
+		mainFileName := "./submissions/edit." + id + ".unverified"
+		mainFileNameIfAccepted := "./submissions/edit." + id + ".verified"
+		PasswordFileName := "./submissions/edit." + id + ".password"
+
+		_, err := os.ReadFile(mainFileName)
+		if err != nil && os.IsNotExist(err) {
+			//http.Error(w, BadRequestMessage, 400)
+			http.Error(w, "MainFileReadError", 400)
+			return
+		}
+		//If that test succeeds, check the password
+
+		passwordFileText, err := os.ReadFile(PasswordFileName)
+		if err != nil && os.IsNotExist(err) {
+			//http.Error(w, BadRequestMessage, 400)
+			http.Error(w, "passwordfile read error", 400)
+			return
+		}
+
+		if string(passwordFileText) == password {
+			// Password accepted.
+			// change the filename to accepted submission
+			if linkerr := os.Rename(mainFileName, mainFileNameIfAccepted); linkerr != nil {
+				http.Error(w, linkerr.Error(), 500)
+				return
+			}
+
+		} else {
+			//http.Error(w, BadRequestMessage, 400)
+			http.Error(w, "incorrect password", 400)
+			return
+		}
+
+		http.Redirect(w, r, "/", 200)
+
 	case "uploadugly":
 		if r.Method != "POST" {
 			SendJSONSuccessOrErrorMessage(w, false, "405 Only POST method is allowed", 405)
@@ -458,6 +503,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 
 		// write password
 		fileNoEnding := strings.TrimRight(file.Name(), ".unverified")
+		fileIndex := strings.TrimLeft(fileNoEnding, "./submissions/edit.")
 		verifyPassword := randstr.Hex(16)
 		fmt.Println("password", (verifyPassword))
 		passwordFilename := fileNoEnding + ".password"
@@ -465,6 +511,15 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println("password file error", err.Error())
 			SendJSONInternalErrorMessage(w, "500 Internal server error (password file): "+err.Error())
+			return
+		}
+
+		/*
+			Send SMTP email containing password
+		*/
+
+		if err = Apiv1SentSmtpEmailForEditUgly(out.SubmitName, out.SubmitEmail, fileIndex, verifyPassword); err != nil {
+			SendJSONInternalErrorMessage(w, "SMTP Mail error: "+err.Error())
 			return
 		}
 

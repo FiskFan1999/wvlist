@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<style>
+body {
+    background-color: rgb(0,128,128 );
+    font-family: "Georgia", serif;
+}
+
+div {
+background-color:rgb(255,255,255);
+border:solid black 1px;
+padding:1em;
+max-width:50em;
+margin: 2em auto;
+}
+</style>
+<body>
+    <div>
+        <p>Dear {{.Name}},</p>
+        <p>
+        Thank you for the edits or corrections you submitted to {{.Config.Name}}! To verify your submission, please click on the following link.
+        </p>
+        <a href="{{.Href}}">{{.Href}}</a>
+        <p>Note: This email was sent to {{.Email}} because you or someone else specified this email address as the verification email address for a submission to this service.</p>
+    </div>
+</body>
+</html>
