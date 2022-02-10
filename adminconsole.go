@@ -133,6 +133,16 @@ func AdminListCommand(argv []string) string {
 }
 
 func AdminGetSubmissionFromSnippet(id string) (*os.DirEntry, string) {
+	a, b := AdminGetAnyFileTypeFromSnippet(id, "submission")
+	return a, b
+}
+
+func AdminGetEditFromSnippet(id string) (*os.DirEntry, string) {
+	a, b := AdminGetAnyFileTypeFromSnippet(id, "edit")
+	return a, b
+}
+
+func AdminGetAnyFileTypeFromSnippet(id string, filetype string) (*os.DirEntry, string) {
 	/*
 		NOTE: user only has to enter a small
 		segment of the id which will lead to a unique
@@ -158,7 +168,7 @@ func AdminGetSubmissionFromSnippet(id string) (*os.DirEntry, string) {
 
 	for _, file := range allSubmissionFiles {
 		name := file.Name()
-		if strings.HasPrefix(name, "submission.") &&
+		if strings.HasPrefix(name, filetype+".") &&
 			(strings.HasSuffix(name, ".verified") ||
 				strings.HasSuffix(name, ".unverified")) &&
 			strings.Contains(name, id) {
@@ -443,7 +453,9 @@ func ExecuteAdminCommand(command string) string {
 	case "vs":
 		return AdminViewSubmission(argv) // alias to same command
 	case "vedit":
-		return "vedit"
+		return AdminViewEdit(argv)
+	case "ve":
+		return AdminViewEdit(argv)
 	case "asub":
 		return AdminAcceptSubmission(argv)
 	case "rsub":
@@ -455,6 +467,58 @@ func ExecuteAdminCommand(command string) string {
 	default:
 		return ADMINHELPMESSAGE
 	}
+}
+
+func AdminViewEdit(argv []string) string {
+
+	if len(argv) != 2 {
+		return "vedit <id>"
+	}
+
+	id := argv[1]
+
+	submissionp, errorMessage := AdminGetEditFromSnippet(id)
+	if errorMessage != "" {
+		return errorMessage
+	}
+
+	submission := *submissionp
+
+	fullFileName := SubmissionsDirPath + submission.Name()
+
+	contents, err := os.ReadFile(fullFileName)
+	if err != nil {
+		return "os.ReadFile error " + err.Error()
+	}
+
+	/*
+		Unmarshal contents into the struct
+	*/
+
+	var sub V1UploadEditUglyBodyOutput
+
+	err = json.Unmarshal(contents, &sub)
+
+	/*
+		Get some information about what the submission
+		is editing.
+	*/
+
+	composer, err := ParseCurrentSingle(sub.ID)
+	if err != nil {
+		return "error: this submission has an ID that does not link back to any existing submission."
+	}
+
+	buf := new(bytes.Buffer)
+
+	fmt.Fprintf(buf, "Submission author: %s\n", sub.SubmitName)
+	fmt.Fprintf(buf, "Submission email: %s\n", sub.SubmitEmail)
+
+	fmt.Fprintf(buf, "\nComposer: %s %s\n", composer.ComposerFirst, composer.ComposerLast)
+
+	fmt.Fprintf(buf, "\n%s\n", sub.Diff)
+
+	return buf.String()
 }
 
 func AdminRejectSubmission(argv []string) string {
