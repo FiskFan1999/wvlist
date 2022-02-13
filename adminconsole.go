@@ -581,6 +581,66 @@ func AdminAcceptEdit(argv []string) string {
 		return "error removing previous edit submission file: " + err.Error()
 	}
 
+	/*
+		Write the note and author to the .notes file.
+	*/
+
+	notesFileName := "./current/" + csvid + ".notes"
+	notesContents, err := os.ReadFile(notesFileName)
+	if err != nil {
+		return "error reading notes file: " + err.Error()
+	}
+
+	/*
+		Parse csv
+	*/
+
+	var notesList [][]string
+
+	notesList, err = csv.NewReader(bytes.NewReader(notesContents)).ReadAll()
+	if err != nil {
+		return "parse notes file error: " + err.Error()
+	}
+	fmt.Println(notesList)
+
+	newRow := make([]string, 3)
+	/*
+		Order:
+		[0] = Author (Anonymous
+		[1] = DateSTR
+		[2] = message
+	*/
+
+	if strings.TrimSpace(sub.SubmitName) != "" {
+		newRow[0] = sub.SubmitName
+	} else {
+		newRow[0] = "Anonymous"
+	}
+
+	newRow[1] = GetCurrentDateStr()
+	newRow[2] = sub.Notes
+
+	notesList = append(notesList, newRow)
+
+	// marshal csv and write to notes
+
+	buf := new(bytes.Buffer)
+
+	w := csv.NewWriter(buf)
+	w.WriteAll(notesList)
+	if w.Error() != nil {
+		return "csv notes write error: " + w.Error().Error()
+	}
+
+	newNotesFile, err := os.Create(notesFileName)
+	if err != nil {
+		return "notes file rewrite error: " + err.Error()
+	}
+	_, err = newNotesFile.Write(buf.Bytes())
+	if err != nil {
+		return "notes csv file write error: " + err.Error()
+	}
+
 	return string(output)
 
 }
