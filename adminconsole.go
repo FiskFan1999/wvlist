@@ -35,8 +35,10 @@ ls - list all verified submissions
 vsub <id> - View a submission
 vedit <id> - View an edit
 asub <id> - Accept a submission
+aedit <id> - Accept an edit
 rsub <id> - Reject a submission
 testemail <address> - Send an email to test SMTP settings
+deletelily - Delete all lilypond files, to be re-rendered.
 help - list all available commands`
 )
 
@@ -465,11 +467,34 @@ func ExecuteAdminCommand(command string) string {
 		return AdminRejectSubmission(argv)
 	case "testemail":
 		return AdminTestEmail(argv)
+	case "deletelily":
+		return DeleteLily()
 	case "help":
 		fallthrough
 	default:
 		return ADMINHELPMESSAGE
 	}
+}
+
+func DeleteLily() string {
+	lilypondDirectory := "./lilypond/"
+	files, err := os.ReadDir(lilypondDirectory)
+	if err != nil {
+		return "read dir error: " + err.Error()
+	}
+
+	l := len(files)
+
+	for _, file := range files {
+		filename := lilypondDirectory + file.Name()
+		if err = os.Remove(filename); err != nil {
+			return "delete file error (" + filename + "): " + err.Error()
+		}
+
+	}
+	buf := new(bytes.Buffer)
+	fmt.Fprintf(buf, "Deleted %d files", l)
+	return buf.String()
 }
 
 func GetAcceptEditPatchCommand(file, patch string) *exec.Cmd {
