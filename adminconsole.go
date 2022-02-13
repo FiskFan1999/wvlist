@@ -20,6 +20,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 )
@@ -458,6 +459,8 @@ func ExecuteAdminCommand(command string) string {
 		return AdminViewEdit(argv)
 	case "asub":
 		return AdminAcceptSubmission(argv)
+	case "aedit":
+		return AdminAcceptEdit(argv)
 	case "rsub":
 		return AdminRejectSubmission(argv)
 	case "testemail":
@@ -467,6 +470,119 @@ func ExecuteAdminCommand(command string) string {
 	default:
 		return ADMINHELPMESSAGE
 	}
+}
+
+func GetAcceptEditPatchCommand(file, patch string) *exec.Cmd {
+	/*
+		file and patch are filenames
+	*/
+	return exec.Command("patch", "-V", "t", "-b", "-f", file, patch)
+}
+
+func AdminAcceptEdit(argv []string) string {
+	if len(argv) < 2 {
+		return "asub <id>"
+	}
+
+	id := argv[1]
+	submissionp, errorMessage := AdminGetEditFromSnippet(id)
+	if errorMessage != "" {
+		return errorMessage
+	}
+
+	submission := *submissionp
+	if len(argv) < 3 || argv[2] != "confirm" {
+		return "About to accept " + submission.Name() + "\nAre you sure you want to do this? Type asub <id> confirm"
+	}
+
+	fullFileName := SubmissionsDirPath + submission.Name()
+
+	contents, err := os.ReadFile(fullFileName)
+	if err != nil {
+		return "read file error: " + err.Error()
+	}
+
+	/*
+		Unmarshal contents into the struct
+	*/
+
+	var sub V1UploadEditUglyBodyOutput
+
+	err = json.Unmarshal(contents, &sub)
+	if err != nil {
+		return "submission json parsing error: " + err.Error()
+	}
+
+	/*
+		Get the filename which is being edited.
+	*/
+
+	csvid := sub.ID
+	csvFileName := "./current/" + csvid + ".csv"
+
+	if _, err := os.ReadFile(csvFileName); err != nil {
+		return "file to be edited read error: " + err.Error()
+	}
+
+	/*
+		Write the patch to a temp file, to be passed to the
+	*/
+
+	var thePatch []byte = sub.Diff
+
+	PatchTempFile, err := os.CreateTemp("", "*")
+	if err != nil {
+		return "patch temp file error: " + err.Error()
+	}
+	defer os.Remove(PatchTempFile.Name())
+
+	if _, err = PatchTempFile.Write(thePatch); err != nil {
+		return "write patch to temp file error: " + err.Error()
+	}
+
+	PatchTempFile.Close()
+
+	cmd := GetAcceptEditPatchCommand(csvFileName, PatchTempFile.Name())
+
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		return string(output) + "\n" + err.Error()
+	}
+
+	/*
+		Change the filename of the edit
+		submission to accepted.
+	*/
+
+	sub.SubmitEmail = "" // erase email
+
+	var remarshal []byte
+	remarshal, err = json.MarshalIndent(sub, "", "  ")
+	if err != nil {
+		return "remarshal error: " + err.Error()
+
+	}
+
+	editFilenameSplit := strings.Split(fullFileName, ".")
+	newEditFileName := strings.Join(editFilenameSplit[0:len(editFilenameSplit)-1], ".") + ".accepted"
+
+	newFile, err := os.Create(newEditFileName)
+	if err != nil {
+		return "new edit file create error: " + err.Error()
+	}
+
+	if _, err = newFile.Write(remarshal); err != nil {
+		return "new edit file write error: " + err.Error()
+	}
+
+	newFile.Close()
+	if err = os.Remove(fullFileName); err != nil {
+		return "error removing previous edit submission file: " + err.Error()
+	}
+
+	return string(output)
+
 }
 
 func AdminViewEdit(argv []string) string {
