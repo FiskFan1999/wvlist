@@ -3,11 +3,13 @@ package main
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/jordan-wright/email"
 	"html/template"
 	"net/smtp"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -150,8 +152,25 @@ type Apiv1SendSmtpEmailForSubmitUglyStr struct {
 
 func Apiv1SendSmtpEmailForSubmitUgly(san V1UploadUglySanitizedInput, fileIndex string, password string) error {
 	/*
-		TO DO
+		Marshal contents of san
+		to temp file and send that.
 	*/
+
+	tmpFile, err := os.CreateTemp("", "*.json")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(tmpFile.Name())
+
+	marshaled, err := json.MarshalIndent(san, "", "  ")
+	if err != nil {
+		return err
+	}
+	if _, err = tmpFile.Write(marshaled); err != nil {
+		return err
+	}
+	tmpFile.Close()
+
 	name := san.SubmitName
 	emailAddress := san.SubmitEmail
 	fmt.Println("sending email to", emailAddress)
@@ -170,7 +189,7 @@ func Apiv1SendSmtpEmailForSubmitUgly(san V1UploadUglySanitizedInput, fileIndex s
 	var buf bytes.Buffer
 	htmlTemplate.Execute(&buf, a)
 
-	_, err = SendSMTPEmail([]string{emailAddress}, "Submission", buf.Bytes())
+	_, err = SendSMTPEmail([]string{emailAddress}, "Submission", buf.Bytes(), tmpFile.Name())
 	return err
 
 }
