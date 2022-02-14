@@ -523,7 +523,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		SendJSONErrorMessage(w, "Hello, this hasn't been made yet!")
+		SendJSONSuccessMessage(w, "The edit submission has been processed. Thank you!")
 	default:
 		http.Error(w, "404 Not Found", 404)
 		return
