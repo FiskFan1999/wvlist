@@ -114,7 +114,35 @@ type Apiv1SentSmtpEmailForEditUglyStr struct {
 	Href   string
 }
 
-func Apiv1SentSmtpEmailForEditUgly(name, email, id, password string) error {
+func Apiv1SentSmtpEmailForEditUgly(name, email, id, password string, info V1UploadEditUglyBodyOutputForEmail, diff []byte) error {
+	/*
+		Write the info json file and diff to temp files and send them with the email
+	*/
+	tmpFileInfo, err := os.CreateTemp("", "*.json")
+	if err != nil {
+		return err
+	}
+	cont, err := json.MarshalIndent(info, "", "  ")
+	if err != nil {
+		return err
+	}
+	if _, err = tmpFileInfo.Write(cont); err != nil {
+		return err
+	}
+	tmpFileInfo.Close()
+	defer os.Remove(tmpFileInfo.Name())
+
+	tmpFileDiff, err := os.CreateTemp("", "*.patch")
+	if err != nil {
+		return err
+	}
+
+	if _, err = tmpFileDiff.Write(diff); err != nil {
+		return err
+	}
+	tmpFileDiff.Close()
+	defer os.Remove(tmpFileDiff.Name())
+
 	fmt.Println("Sending email to", name, "at", email)
 	var san Apiv1SentSmtpEmailForEditUglyStr
 	san.Config = *FullConfig
@@ -138,7 +166,7 @@ func Apiv1SentSmtpEmailForEditUgly(name, email, id, password string) error {
 		return err
 	}
 
-	_, err = SendSMTPEmail([]string{email}, "Edit submission", buf.Bytes())
+	_, err = SendSMTPEmail([]string{email}, "Edit submission", buf.Bytes(), tmpFileInfo.Name(), tmpFileDiff.Name())
 
 	return err
 }

@@ -42,6 +42,14 @@ type V1UploadEditUglyBodyOutput struct {
 	Diff        []byte
 }
 
+type V1UploadEditUglyBodyOutputForEmail struct {
+	ComposerName string
+	Notes        string
+	SubmitName   string
+	SubmitEmail  string
+	// note: write diff to selerate file
+}
+
 func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 	var argvraw []string
 	for _, arg := range strings.Split(r.URL.Path, "/")[3:] {
@@ -516,9 +524,23 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 
 		/*
 			Send SMTP email containing password
+			Transfer data to new json file to be
+			marshaled for email
 		*/
+		var forEmail V1UploadEditUglyBodyOutputForEmail
 
-		if err = Apiv1SentSmtpEmailForEditUgly(out.SubmitName, out.SubmitEmail, fileIndex, verifyPassword); err != nil {
+		ComposerInfo, err := ParseCurrentSingle(id)
+		if err != nil {
+			SendJSONInternalErrorMessage(w, "Parse Current Single Error: "+err.Error())
+			return
+		}
+
+		forEmail.ComposerName = ComposerInfo.ComposerLast + ", " + ComposerInfo.ComposerFirst
+		forEmail.Notes = out.Notes
+		forEmail.SubmitName = out.SubmitName
+		forEmail.SubmitEmail = out.SubmitEmail
+
+		if err = Apiv1SentSmtpEmailForEditUgly(out.SubmitName, out.SubmitEmail, fileIndex, verifyPassword, forEmail, out.Diff); err != nil {
 			SendJSONInternalErrorMessage(w, "SMTP Mail error: "+err.Error())
 			return
 		}
