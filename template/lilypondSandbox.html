@@ -21,6 +21,12 @@
             {{ if .CommandOutput}}
             <pre style="font-family:monospace;">{{.CommandOutput}}</pre>
             {{end}}
+            <div class="flex">
+            {{ range .LilypondIncipitExamples }}
+            <div class="noborder"><img src="{{ . }}" alt="lilypond example incipit"></div>
+            {{ end }}
+            </div>
+            <p>{{ .InfoText}}</p>
         </div>
 <script>
     function saveToClipboard() {

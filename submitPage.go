@@ -40,7 +40,7 @@ func SubmitPage(w http.ResponseWriter, r *http.Request) {
 
 	var inp SubmitPageTemplateInput
 	inp.Config = *FullConfig
-	inp.SubmissionMessage = "sub message here"
+	inp.SubmissionMessage = SubmitPageText
 	inp.Rows = HowManyRowsToAddAtATime
 	inp.Up = UpChar
 	inp.Down = DownChar

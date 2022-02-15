@@ -24,12 +24,14 @@ const (
 )
 
 type LilySandInput struct {
-	IsPost             bool
-	Command            string
-	CommandBeginLength uint
-	CommandMaxLength   uint
-	CommandOutput      string
-	ImageHref          string
+	IsPost                  bool
+	Command                 string
+	CommandBeginLength      uint
+	CommandMaxLength        uint
+	CommandOutput           string
+	ImageHref               string
+	InfoText                string
+	LilypondIncipitExamples []string
 }
 
 func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
@@ -40,6 +42,8 @@ func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var lsi LilySandInput
+	lsi.InfoText = LilypondPageText
+	lsi.LilypondIncipitExamples = LilyIncipitExamples
 	query_lilypond := r.URL.Query()["lilypond"]
 	lsi.Command = ""
 	if len(query_lilypond) > 0 {

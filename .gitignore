@@ -14,3 +14,5 @@
 !homepageMenuContents.csv
 !go.sum
 !Makefile
+!rootstatic/lilypondexamples/
+!rootstatic/lilypondexamples/*
