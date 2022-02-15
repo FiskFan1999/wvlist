@@ -16,6 +16,18 @@
                 </ul>
             </div>
             {{ end }}
+            <span><b>Administrators:</b></span>
+            <div class="flex" >
+            {{ range .Config.Admins}}
+            <div class="noborder" style="margin-bottom: 1em;padding-right:2em;">
+                <center><span>{{ .Name }}</span></center>
+                {{ if not .HideEmail }}
+                <center><span style="font-family:monospace;"><a href="mailto:{{ .Email }}">{{ .Email }}</a></span></center>
+                {{ end }}
+            </div>
+            {{ end }}
+            </div>
+            
             <form method="get">
                 <input placeholder="Search by Composer's name" type="text" id="search" name="search" value="{{ .SearchTerm }}">
                 <input type="submit" value="Search">
