@@ -38,6 +38,10 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if FullConfig.TorAddress != "" {
+		w.Header().Add("Onion-Location", FullConfig.TorAddress)
+	}
+
 	fullList := GetAllLists()
 
 	var inp HomePageTemplateInput
