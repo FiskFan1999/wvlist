@@ -1,6 +1,7 @@
 {
     "name": "wvlist",
     "hostname": "",
+    "tor_address": "",
     "lilypond_version": "2.20.0",
     "lilypond_timeout": "10s",
     "smtp_destination": "",
