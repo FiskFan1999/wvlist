@@ -14,6 +14,7 @@
         {
             "name": "Full name here",
             "email": "email@example.com",
+            "hideemail": false,
             "username": "username",
             "hash": "$2a$10$xxxxxxxxxx (should be replaced by ./wvlist password)"
         }
