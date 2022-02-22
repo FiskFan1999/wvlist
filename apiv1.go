@@ -540,9 +540,11 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 		forEmail.SubmitName = out.SubmitName
 		forEmail.SubmitEmail = out.SubmitEmail
 
-		if err = Apiv1SentSmtpEmailForEditUgly(out.SubmitName, out.SubmitEmail, fileIndex, verifyPassword, forEmail, out.Diff); err != nil {
-			SendJSONInternalErrorMessage(w, "SMTP Mail error: "+err.Error())
-			return
+		if strings.TrimSpace(out.SubmitEmail) != "" {
+			if err = Apiv1SentSmtpEmailForEditUgly(out.SubmitName, out.SubmitEmail, fileIndex, verifyPassword, forEmail, out.Diff); err != nil {
+				SendJSONInternalErrorMessage(w, "SMTP Mail error: "+err.Error())
+				return
+			}
 		}
 
 		SendJSONSuccessMessage(w, "The edit submission has been processed. Thank you!")
