@@ -9,6 +9,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gosimple/unidecode"
 	"os"
 	"sort"
 	"strings"
@@ -52,7 +53,8 @@ func GetAllLists() (FullIndexList []FullListIndex) {
 
 	// Sort by alphabetical name
 	sort.SliceStable(FullIndexList, func(i, j int) bool {
-		return strings.ToLower(FullIndexList[i].Name) < strings.ToLower(FullIndexList[j].Name)
+		return (strings.ToLower(unidecode.Unidecode(FullIndexList[i].Name)) <
+			strings.ToLower(unidecode.Unidecode(FullIndexList[j].Name)))
 	})
 
 	return
