@@ -16,8 +16,9 @@ import (
 )
 
 type FullListIndex struct {
-	Name string
-	Path string
+	Name     string
+	NameSort string
+	Path     string
 }
 
 func GetAllLists() (FullIndexList []FullListIndex) {
@@ -41,6 +42,10 @@ func GetAllLists() (FullIndexList []FullListIndex) {
 
 		var i FullListIndex
 		i.Name = CS.ComposerLast + ", " + CS.ComposerFirst
+		i.NameSort = i.Name
+		if CS.ComposerLastSort != "" {
+			i.NameSort = CS.ComposerLastSort + ", " + CS.ComposerFirst
+		}
 		i.Path = strings.TrimRight(fname, ".json")
 
 		FullIndexList = append(FullIndexList, i)
@@ -53,8 +58,14 @@ func GetAllLists() (FullIndexList []FullListIndex) {
 
 	// Sort by alphabetical name
 	sort.SliceStable(FullIndexList, func(i, j int) bool {
-		return (strings.ToLower(unidecode.Unidecode(FullIndexList[i].Name)) <
-			strings.ToLower(unidecode.Unidecode(FullIndexList[j].Name)))
+		var FIA, FIB FullListIndex
+		FIA = FullIndexList[i]
+		FIB = FullIndexList[j]
+		var a, b string
+		a = FIA.NameSort
+		b = FIB.NameSort
+
+		return strings.ToLower(unidecode.Unidecode(a)) < strings.ToLower(unidecode.Unidecode(b))
 	})
 
 	return
