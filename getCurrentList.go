@@ -37,14 +37,15 @@ type CurrentSingle struct {
 	Delete string
 	Rows   int
 
-	ID            string // used for edit page
-	ComposerFirst string `json:"first"`
-	ComposerLast  string `json:"last"`
-	ComposerBirth int    `json:"birth"`
-	ComposerDeath int    `json:"death"`
-	Notes         []Note
-	WVList        []WVEntry
-	Lock          string `json:"lock"` // basic lock, prevents from further editing
+	ID               string // used for edit page
+	ComposerFirst    string `json:"first"`
+	ComposerLast     string `json:"last"`
+	ComposerLastSort string `json:"lastsort"`
+	ComposerBirth    int    `json:"birth"`
+	ComposerDeath    int    `json:"death"`
+	Notes            []Note
+	WVList           []WVEntry
+	Lock             string `json:"lock"` // basic lock, prevents from further editing
 }
 
 func GetAllCurrent() FullCurrentList {
