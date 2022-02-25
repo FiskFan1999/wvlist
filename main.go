@@ -15,16 +15,6 @@ var Version string
 
 func main() {
 
-	/*
-		Check for required directories
-		This function also handles the
-		creation of these directories.
-	*/
-	if err := CheckForNeededDirs(); err != nil {
-		fmt.Println("ERROR while checking for required directories:", err.Error())
-		os.Exit(1)
-	}
-
 	LilypondFilesToMake = make(chan LilypondFileToMakeStr, 256)
 	go LilypondWriteIncipitsFromChannel()
 
@@ -53,6 +43,28 @@ func main() {
 	}
 	FullConfig.Commit = Commit
 	FullConfig.Version = Version
+
+	/*
+		Check for required directories
+		This function also handles the
+		creation of these directories.
+	*/
+	if err := CheckForNeededDirs(); err != nil {
+		fmt.Println("ERROR while checking for required directories:", err.Error())
+		os.Exit(1)
+	}
+
+	/*
+		Check for lilypond
+	*/
+	LilypondVer, err := CheckForLilypondAtStart()
+	if err != nil {
+		fmt.Print("---------------\nERROR while initializing: lilypond error:\n")
+		fmt.Println(err.Error())
+		fmt.Print("The incipits and lilypond sandbox will NOT work properly.\n---------------\n")
+	} else {
+		fmt.Printf("%s", LilypondVer)
+	}
 
 	argv := flag.Args()
 

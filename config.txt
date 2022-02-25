@@ -8,6 +8,9 @@ This is the address of the instance, including the protocol ("https://" or "http
 > "tor_address": string
 This is the address of the instance as a hidden service. If the service is available both over clearnet and Tor network, write the clearnet address (https://example.net) in "hostname" and the hidden address ("http://abcdefg.onion") in "tor_address". This address is written as a header so that it is interpreted by the Tor browser as an "Onion Address available"
 
+> "lilypond_path": string/"lilypond"
+This string will be inserted as "$0" in the os.exec command that runs lilypond to create incipits for the submissions and for the sandbox. Can be a full path to the lilypond binary, or just "lilypond" if the binary is in $PATH.
+
 > "lilypond_version": string/"2.20.0"
 The version of lilypond which is installed in the system. Note that this value is inserted into the lilypond template, "\version "2.20.0".
 

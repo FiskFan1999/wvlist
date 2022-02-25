@@ -19,6 +19,7 @@ type ConfigStr struct {
 	Name            string `json:"name"`
 	Hostname        string `json:"hostname"`
 	TorAddress      string `json:"tor_address"`
+	LilypondPath    string `json:"lilypond_path"`
 	LilypondVersion string `json:"lilypond_version"`
 	LilypondTimeout string `json:"lilypond_timeout"`
 	LilyTimeStr     time.Duration
