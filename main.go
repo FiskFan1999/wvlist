@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -13,6 +14,16 @@ var Commit string
 var Version string
 
 func main() {
+
+	/*
+		Check for required directories
+		This function also handles the
+		creation of these directories.
+	*/
+	if err := CheckForNeededDirs(); err != nil {
+		fmt.Println("ERROR while checking for required directories:", err.Error())
+		os.Exit(1)
+	}
 
 	LilypondFilesToMake = make(chan LilypondFileToMakeStr, 256)
 	go LilypondWriteIncipitsFromChannel()
