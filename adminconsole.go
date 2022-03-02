@@ -312,7 +312,7 @@ func AdminAcceptSubmission(argv []string) string {
 		Get file to upload to
 	*/
 
-	newJsonFile, err := os.CreateTemp("./current/", "*.json")
+	newJsonFile, err := CreateTemp("./current/", "*.json")
 	if err != nil {
 		return ".json file create temp error: " + err.Error()
 	}
@@ -555,7 +555,7 @@ func AdminAcceptEdit(argv []string) string {
 
 	var thePatch []byte = sub.Diff
 
-	PatchTempFile, err := os.CreateTemp("", "*")
+	PatchTempFile, err := CreateTemp("", "*")
 	if err != nil {
 		return "patch temp file error: " + err.Error()
 	}
