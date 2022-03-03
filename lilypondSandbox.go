@@ -87,9 +87,9 @@ func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		tmpFileIn, err := os.CreateTemp("./rootstatic/", "lilyfile_in.*.ly")
+		tmpFileIn, err := CreateTemp("./rootstatic/", "lilyfile_in.*.ly")
 		if err != nil {
-			fmt.Println("os.CreateTemp error", err)
+			fmt.Println("CreateTemp error", err)
 			return
 		}
 
@@ -101,9 +101,9 @@ func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
 
 		go deleteFileFunc(tmpFileIn)
 
-		tmpFileOut, err := os.CreateTemp("./rootstatic/", "lilyfile_out.*")
+		tmpFileOut, err := CreateTemp("./rootstatic/", "lilyfile_out.*")
 		if err != nil {
-			fmt.Println("os.CreateTemp error", err)
+			fmt.Println("CreateTemp error", err)
 			return
 		}
 
