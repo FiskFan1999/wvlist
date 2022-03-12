@@ -11,7 +11,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"text/template"
 )
@@ -58,10 +57,10 @@ func CreateLilypondIncipit(originalScore, filename string) {
 
 	// save this to a temporary file
 
-	tmpFile, err := os.CreateTemp("", "lilyfile")
+	tmpFile, err := CreateTemp("", "lilyfile")
 	if err != nil {
 		tmpFile.Close()
-		fmt.Println("os.CreateTemp error", err)
+		fmt.Println("CreateTemp error", err)
 		return
 	}
 	defer tmpFile.Close()

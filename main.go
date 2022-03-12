@@ -96,8 +96,8 @@ func main() {
 		pmux := http.NewServeMux()
 		tmux := http.NewServeMux()
 
-		pmux.HandleFunc("/", HomePage)
-		tmux.HandleFunc("/", HomePage)
+		pmux.HandleFunc("/", HomePage(false))
+		tmux.HandleFunc("/", HomePage(true))
 
 		pmux.HandleFunc("/view/", ViewPage)
 		tmux.HandleFunc("/view/", ViewPage)
