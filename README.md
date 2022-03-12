@@ -21,11 +21,13 @@ In addition to the modules imported by the Go compiler, this project requires th
 Please feel free to join the conversation on IRC.
 
 Main network:
-- [`irc.ergo.chat:6697 (TLS) #wvlist`](https://ergo.chat/kiwi/#wvlist) (Click for browser client)
+- [`irc.ergo.chat:6697 (TLS) #wvlist`](https://ergo.chat/kiwi/#wvlist)
+
+(Click to open web-browser client which can be found at https://ergo.chat/kiwi/#wvlist)
 
 Alternate networks:
 - `irc.oftc.net #wvlist`
 - `irc.libera.chat #wvlist-dev`
 - `irc.williamrehwinkel.net #wvlist`
 
-Available on Matrix: [`#wvlist-dev:libera.chat`](https://matrix.to/#/#wvlist-dev:libera.chat)
+Available on Matrix: [`#wvlist-dev:libera.chat`](https://matrix.to/#/#wvlist-dev:libera.chat) (click for matrix.to link)
