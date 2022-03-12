@@ -184,7 +184,7 @@ func Apiv1SendSmtpEmailForSubmitUgly(san V1UploadUglySanitizedInput, fileIndex s
 		to temp file and send that.
 	*/
 
-	tmpFile, err := os.CreateTemp("", "*.json")
+	tmpFile, err := CreateTemp("", "*.json")
 	if err != nil {
 		return err
 	}

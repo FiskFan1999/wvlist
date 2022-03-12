@@ -236,7 +236,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 			Marshall sanitizedInputStr to a new tempfile in /submissions/
 		*/
 
-		file, err := os.CreateTemp("./submissions", "submission.*.unverified")
+		file, err := CreateTemp("./submissions", "submission.*.unverified")
 		if err != nil {
 			fmt.Println(err.Error())
 			SendJSONInternalErrorMessage(w, "500 Internal server error: "+err.Error())
@@ -488,7 +488,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 		out.Notes = eug.Notes
 		out.Diff = output
 
-		file, err := os.CreateTemp("./submissions", "edit.*.unverified")
+		file, err := CreateTemp("./submissions", "edit.*.unverified")
 		if err != nil {
 			fmt.Println(err.Error())
 			SendJSONInternalErrorMessage(w, "500 Internal server error: "+err.Error())
