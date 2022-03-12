@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -126,7 +127,7 @@ func main() {
 		if Params.PlaintextPort != 0 {
 			wg.Add(1)
 			go func() {
-				http.ListenAndServe(":"+strconv.FormatUint(Params.PlaintextPort, 10), pmux)
+				log.Fatal(http.ListenAndServe(":"+strconv.FormatUint(Params.PlaintextPort, 10), pmux))
 				wg.Done()
 			}()
 		}
@@ -134,9 +135,9 @@ func main() {
 			wg.Add(1)
 			go func() {
 				if Params.DebugModeTLS {
-					http.ListenAndServe(":"+strconv.FormatUint(Params.TLSPort, 10), tmux)
+					log.Fatal(http.ListenAndServe(":"+strconv.FormatUint(Params.TLSPort, 10), tmux))
 				} else {
-					http.ListenAndServeTLS(":"+strconv.FormatUint(Params.TLSPort, 10), Params.FullCert, Params.PrivCert, tmux)
+					log.Fatal(http.ListenAndServeTLS(":"+strconv.FormatUint(Params.TLSPort, 10), Params.FullCert, Params.PrivCert, tmux))
 				}
 				wg.Done()
 			}()
