@@ -555,7 +555,7 @@ func AdminAcceptEdit(argv []string) string {
 
 	var thePatch []byte = sub.Diff
 
-	PatchTempFile, err := CreateTemp("", "*")
+	PatchTempFile, err := os.CreateTemp("", "*")
 	if err != nil {
 		return "patch temp file error: " + err.Error()
 	}
