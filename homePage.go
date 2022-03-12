@@ -28,48 +28,50 @@ type HomePageTemplateInput struct {
 	CommitSnippet string
 }
 
-func HomePage(w http.ResponseWriter, r *http.Request) {
+func HomePage(isTLS bool) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-	/*
-		If path is not equal to /, treat it as calling a root static file
-	*/
-	if r.URL.Path != "/" {
-		GetRootStaticFile(w, r)
-		return
+		/*
+			If path is not equal to /, treat it as calling a root static file
+		*/
+		if r.URL.Path != "/" {
+			GetRootStaticFile(w, r)
+			return
+		}
+
+		if FullConfig.TorAddress != "" && isTLS {
+			w.Header().Add("Onion-Location", FullConfig.TorAddress)
+		}
+
+		fullList := GetAllLists()
+
+		var inp HomePageTemplateInput
+		inp.Config = *FullConfig
+		inp.List = fullList
+		inp.Table = GetHomePageMenuContents()
+		inp.CommitHTML, inp.CommitSnippet = GetLinkToCommitInRepositry(FullConfig.Commit)
+
+		/*
+			Parse search and if there is a searched query,
+			search for composers by that name
+		*/
+
+		searchQueryTermList := r.URL.Query()["search"]
+		if len(searchQueryTermList) != 0 && len(searchQueryTermList[0]) != 0 {
+			searchQueryTerm := searchQueryTermList[0]
+			inp.SearchTerm = searchQueryTerm
+			fmt.Println("searching", searchQueryTerm)
+			inp.List = GetResultsSearchComposerIndex(inp.List[:], searchQueryTerm)
+		}
+
+		homeTemplatePath := "./template/homepage.html"
+		tmp, err := template.ParseFiles(homeTemplatePath)
+		if err != nil {
+			http.Error(w, "Internal server error", 500)
+			return
+		}
+		tmp.Execute(w, inp)
 	}
-
-	if FullConfig.TorAddress != "" {
-		w.Header().Add("Onion-Location", FullConfig.TorAddress)
-	}
-
-	fullList := GetAllLists()
-
-	var inp HomePageTemplateInput
-	inp.Config = *FullConfig
-	inp.List = fullList
-	inp.Table = GetHomePageMenuContents()
-	inp.CommitHTML, inp.CommitSnippet = GetLinkToCommitInRepositry(FullConfig.Commit)
-
-	/*
-		Parse search and if there is a searched query,
-		search for composers by that name
-	*/
-
-	searchQueryTermList := r.URL.Query()["search"]
-	if len(searchQueryTermList) != 0 && len(searchQueryTermList[0]) != 0 {
-		searchQueryTerm := searchQueryTermList[0]
-		inp.SearchTerm = searchQueryTerm
-		fmt.Println("searching", searchQueryTerm)
-		inp.List = GetResultsSearchComposerIndex(inp.List[:], searchQueryTerm)
-	}
-
-	homeTemplatePath := "./template/homepage.html"
-	tmp, err := template.ParseFiles(homeTemplatePath)
-	if err != nil {
-		http.Error(w, "Internal server error", 500)
-		return
-	}
-	tmp.Execute(w, inp)
 }
 
 func GetHomePageMenuContents() (menu []HomepageMenuContentSingle) {

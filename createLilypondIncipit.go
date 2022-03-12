@@ -61,7 +61,7 @@ func CreateLilypondIncipit(originalScore, filename string) {
 	tmpFile, err := os.CreateTemp("", "lilyfile")
 	if err != nil {
 		tmpFile.Close()
-		fmt.Println("os.CreateTemp error", err)
+		fmt.Println("CreateTemp error", err)
 		return
 	}
 	defer tmpFile.Close()

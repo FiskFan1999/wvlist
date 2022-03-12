@@ -204,7 +204,7 @@ func AdminGetAnyFileTypeFromSnippet(id string, filetype string) (*os.DirEntry, s
 }
 
 func AdminViewSubmission(argv []string) string {
-	if len(argv) < 2 {
+	if len(argv) != 2 {
 		return "vsub <id>"
 	}
 
@@ -258,7 +258,7 @@ func AdminViewSubmission(argv []string) string {
 }
 
 func AdminAcceptSubmission(argv []string) string {
-	if len(argv) < 2 {
+	if len(argv) != 2 && len(argv) != 3 {
 		return "asub <id>"
 	}
 
@@ -269,7 +269,7 @@ func AdminAcceptSubmission(argv []string) string {
 	}
 
 	submission := *submissionp
-	if len(argv) < 3 || argv[2] != "confirm" {
+	if len(argv) != 3 || argv[2] != "confirm" {
 		return "About to accept " + submission.Name() + "\nAre you sure you want to do this? Type asub <id> confirm"
 	}
 
@@ -313,7 +313,7 @@ func AdminAcceptSubmission(argv []string) string {
 		Get file to upload to
 	*/
 
-	newJsonFile, err := os.CreateTemp("./current/", "*.json")
+	newJsonFile, err := CreateTemp("./current/", "*.json")
 	if err != nil {
 		return ".json file create temp error: " + err.Error()
 	}
@@ -508,7 +508,7 @@ func GetAcceptEditPatchCommand(file, patch string) *exec.Cmd {
 }
 
 func AdminAcceptEdit(argv []string) string {
-	if len(argv) < 2 {
+	if len(argv) != 2 && len(argv) != 3 {
 		return "asub <id>"
 	}
 
@@ -719,6 +719,7 @@ func AdminViewEdit(argv []string) string {
 	fmt.Fprintf(buf, "Submission email: %s\n", sub.SubmitEmail)
 
 	fmt.Fprintf(buf, "\nComposer: %s %s\n", composer.ComposerFirst, composer.ComposerLast)
+	fmt.Fprintf(buf, "Notes: %s\n", sub.Notes)
 
 	fmt.Fprintf(buf, "\n%s\n", sub.Diff)
 
@@ -793,6 +794,10 @@ func AdminRejectEdit(argv []string) string {
 }
 
 func AdminRejectSubmission(argv []string) string {
+	if len(argv) != 2 {
+		return "Error: no <id> specified.\n\nrsub <id>"
+	}
+
 	id := argv[1]
 	submissionp, errorMessage := AdminGetSubmissionFromSnippet(id)
 	if errorMessage != "" {
