@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -88,37 +89,14 @@ func main() {
 			Operate the server and listen as normal
 		*/
 		//Load config
+
 		/*
 			Create seperate plaintext and TLS muxers
 			(plaintext mux will disable operator
 			console)
 		*/
-		pmux := http.NewServeMux()
-		tmux := http.NewServeMux()
-
-		pmux.HandleFunc("/", HomePage(false))
-		tmux.HandleFunc("/", HomePage(true))
-
-		pmux.HandleFunc("/view/", ViewPage)
-		tmux.HandleFunc("/view/", ViewPage)
-
-		pmux.HandleFunc("/submit/", SubmitPage)
-		tmux.HandleFunc("/submit/", SubmitPage)
-
-		pmux.HandleFunc("/edit/", GetEditPage)
-		tmux.HandleFunc("/edit/", GetEditPage)
-
-		pmux.HandleFunc("/lilysand/", LilypondSandbox)
-		tmux.HandleFunc("/lilysand/", LilypondSandbox)
-
-		pmux.HandleFunc("/incipit/", GetLilypond)
-		tmux.HandleFunc("/incipit/", GetLilypond)
-
-		pmux.HandleFunc("/api/v1/", APIv1Handler)
-		tmux.HandleFunc("/api/v1/", APIv1Handler)
-
-		pmux.HandleFunc("/admin/", AdminConsolePlaintextHandler)
-		tmux.HandleFunc("/admin/", AdminConsole)
+		pmux := GetMux(false)
+		tmux := GetMux(true)
 
 		// run plain and tls listeners concurrently
 		wg := new(sync.WaitGroup)
@@ -126,7 +104,7 @@ func main() {
 		if Params.PlaintextPort != 0 {
 			wg.Add(1)
 			go func() {
-				http.ListenAndServe(":"+strconv.FormatUint(Params.PlaintextPort, 10), pmux)
+				log.Fatal(http.ListenAndServe(":"+strconv.FormatUint(Params.PlaintextPort, 10), pmux))
 				wg.Done()
 			}()
 		}
@@ -134,9 +112,9 @@ func main() {
 			wg.Add(1)
 			go func() {
 				if Params.DebugModeTLS {
-					http.ListenAndServe(":"+strconv.FormatUint(Params.TLSPort, 10), tmux)
+					log.Fatal(http.ListenAndServe(":"+strconv.FormatUint(Params.TLSPort, 10), tmux))
 				} else {
-					http.ListenAndServeTLS(":"+strconv.FormatUint(Params.TLSPort, 10), Params.FullCert, Params.PrivCert, tmux)
+					log.Fatal(http.ListenAndServeTLS(":"+strconv.FormatUint(Params.TLSPort, 10), Params.FullCert, Params.PrivCert, tmux))
 				}
 				wg.Done()
 			}()
