@@ -439,7 +439,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 
 		// write this to a temp file
 
-		tmpFileNewSub, err := CreateTemp("", "*.csv")
+		tmpFileNewSub, err := os.CreateTemp("", "*.csv")
 		defer os.Remove(tmpFileNewSub.Name())
 		if err != nil {
 			SendJSONErrorMessage(w, "csv temp file error: "+err.Error())

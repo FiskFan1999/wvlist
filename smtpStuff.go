@@ -118,7 +118,7 @@ func Apiv1SentSmtpEmailForEditUgly(name, email, id, password string, info V1Uplo
 	/*
 		Write the info json file and diff to temp files and send them with the email
 	*/
-	tmpFileInfo, err := CreateTemp("", "*.json")
+	tmpFileInfo, err := os.CreateTemp("", "*.json")
 	if err != nil {
 		return err
 	}
@@ -132,7 +132,7 @@ func Apiv1SentSmtpEmailForEditUgly(name, email, id, password string, info V1Uplo
 	tmpFileInfo.Close()
 	defer os.Remove(tmpFileInfo.Name())
 
-	tmpFileDiff, err := CreateTemp("", "*.patch")
+	tmpFileDiff, err := os.CreateTemp("", "*.patch")
 	if err != nil {
 		return err
 	}
