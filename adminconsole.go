@@ -716,7 +716,7 @@ func AdminViewEdit(argv []string) string {
 	fmt.Fprintf(buf, "Submission email: %s\n", sub.SubmitEmail)
 
 	fmt.Fprintf(buf, "\nComposer: %s %s\n", composer.ComposerFirst, composer.ComposerLast)
-	fmt.Fprintf(buf, "Notes: (NOTES GO HERE)\n")
+	fmt.Fprintf(buf, "Notes: %s\n", sub.Notes)
 
 	fmt.Fprintf(buf, "\n%s\n", sub.Diff)
 
