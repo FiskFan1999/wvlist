@@ -555,7 +555,7 @@ func AdminAcceptEdit(argv []string) string {
 
 	var thePatch []byte = sub.Diff
 
-	PatchTempFile, err := CreateTemp("", "*")
+	PatchTempFile, err := os.CreateTemp("", "*")
 	if err != nil {
 		return "patch temp file error: " + err.Error()
 	}
@@ -716,6 +716,7 @@ func AdminViewEdit(argv []string) string {
 	fmt.Fprintf(buf, "Submission email: %s\n", sub.SubmitEmail)
 
 	fmt.Fprintf(buf, "\nComposer: %s %s\n", composer.ComposerFirst, composer.ComposerLast)
+	fmt.Fprintf(buf, "Notes: %s\n", sub.Notes)
 
 	fmt.Fprintf(buf, "\n%s\n", sub.Diff)
 
