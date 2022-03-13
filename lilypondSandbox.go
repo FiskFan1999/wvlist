@@ -9,9 +9,9 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"html"
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -63,7 +63,7 @@ func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
 		// Load the lilypond template
 		lilypondTmp, err := ttemplate.ParseFiles(LILYPOND_TEMPLATE_FILE)
 		if err != nil {
-			fmt.Println("CreateLilypondIncipit error: ", err)
+			log.Println("CreateLilypondIncipit error: ", err)
 			http.Error(w, "500 Server Internal Error", 500)
 			return
 		}
@@ -76,7 +76,7 @@ func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
 
 		lilypondTmp.Execute(&buf, lti)
 
-		//fmt.Println(buf.String())
+		//log.Println(buf.String())
 
 		// save this to a temporary file
 
@@ -89,13 +89,13 @@ func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
 
 		tmpFileIn, err := CreateTemp("./rootstatic/", "lilyfile_in.*.ly")
 		if err != nil {
-			fmt.Println("CreateTemp error", err)
+			log.Println("CreateTemp error", err)
 			return
 		}
 
 		_, err = tmpFileIn.WriteString(buf.String())
 		if err != nil {
-			fmt.Println("os.WriteString error", err)
+			log.Println("os.WriteString error", err)
 			return
 		}
 
@@ -103,7 +103,7 @@ func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
 
 		tmpFileOut, err := CreateTemp("./rootstatic/", "lilyfile_out.*")
 		if err != nil {
-			fmt.Println("CreateTemp error", err)
+			log.Println("CreateTemp error", err)
 			return
 		}
 
@@ -116,7 +116,7 @@ func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
 			//Delete all files
 			allFiles, err := os.ReadDir("./rootstatic")
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 				return
 			}
 			for _, entry := range allFiles {
@@ -124,7 +124,7 @@ func LilypondSandbox(w http.ResponseWriter, r *http.Request) {
 				if strings.HasPrefix(name, filename) {
 					os.Remove("./rootstatic/" + name)
 				}
-				fmt.Println(name)
+				log.Println(name)
 			}
 		}(tmpFileOutWD)
 

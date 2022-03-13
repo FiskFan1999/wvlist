@@ -10,7 +10,7 @@ package main
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"text/template"
@@ -34,12 +34,12 @@ func GetLilypondExec(in, out, dir string) (*exec.Cmd, context.CancelFunc) {
 }
 
 func CreateLilypondIncipit(originalScore, filename string) {
-	fmt.Println("Now making incipit with score " + originalScore)
+	log.Println("Now making incipit with score " + originalScore)
 
 	// Load the lilypond template
 	tmp, err := template.ParseFiles(LILYPOND_TEMPLATE_FILE)
 	if err != nil {
-		fmt.Println("CreateLilypondIncipit error: ", err)
+		log.Println("CreateLilypondIncipit error: ", err)
 		return
 	}
 
@@ -54,31 +54,31 @@ func CreateLilypondIncipit(originalScore, filename string) {
 
 	tmp.Execute(&buf, t)
 
-	fmt.Println(buf.String())
+	log.Println(buf.String())
 
 	// save this to a temporary file
 
 	tmpFile, err := os.CreateTemp("", "lilyfile")
 	if err != nil {
 		tmpFile.Close()
-		fmt.Println("CreateTemp error", err)
+		log.Println("CreateTemp error", err)
 		return
 	}
 	defer tmpFile.Close()
 	//defer os.Remove(tmpFile.Name())
 
 	if _, err = tmpFile.WriteString(buf.String()); err != nil {
-		fmt.Println("tmpFile.WriteString error", err)
+		log.Println("tmpFile.WriteString error", err)
 		return
 	}
-	fmt.Println("written to file", tmpFile.Name())
+	log.Println("written to file", tmpFile.Name())
 
 	command, cancel := GetLilypondExec(tmpFile.Name(), filename, "./lilypond")
 	defer cancel()
 	combinedOutput, err := command.CombinedOutput()
-	fmt.Println(string(combinedOutput))
+	log.Println(string(combinedOutput))
 	if err != nil {
-		fmt.Println("combined output error", err)
+		log.Println("combined output error", err)
 		return
 	}
 

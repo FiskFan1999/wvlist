@@ -7,8 +7,8 @@ directories if they are not present.
 package main
 
 import (
-	"fmt"
 	"io/fs"
+	"log"
 	"os"
 )
 
@@ -61,7 +61,7 @@ func CheckForNeededDirs() error {
 				return err2
 			}
 
-			fmt.Println("NOTE: Directory", d, "is required but not present. Creating directory now.")
+			log.Println("NOTE: Directory", d, "is required but not present. Creating directory now.")
 
 		} else {
 			/*
@@ -75,7 +75,7 @@ func CheckForNeededDirs() error {
 	for _, f := range FailDirs {
 		_, err := os.ReadDir(f)
 		if err != nil {
-			fmt.Println("FATAL ERROR, critical directory", f, "not found!")
+			log.Println("FATAL ERROR, critical directory", f, "not found!")
 			os.Exit(2)
 		}
 

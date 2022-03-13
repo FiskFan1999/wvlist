@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"html"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -78,13 +79,13 @@ func GetLilypond(w http.ResponseWriter, r *http.Request) {
 
 			contents, err := os.ReadFile(path)
 			if err != nil {
-				fmt.Println("getting lilypond file error", err.Error())
+				log.Println("getting lilypond file error", err.Error())
 				return
 			}
 
 			r := csv.NewReader(bytes.NewReader(contents))
 			fileContents, err := r.ReadAll()
-			fmt.Println(fileContents)
+			log.Println(fileContents)
 
 			/*
 				Check that the row is not out of bounds
@@ -101,7 +102,7 @@ func GetLilypond(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			incipit := fileContents[noInt][3]
-			fmt.Println(incipit)
+			log.Println(incipit)
 
 			newFile.Command = incipit
 			newFile.Filename = LilypondImageFilename

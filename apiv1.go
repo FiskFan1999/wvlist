@@ -5,14 +5,15 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"github.com/thanhpk/randstr"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/thanhpk/randstr"
 )
 
 type V1UploadUglySanitizedInput struct {
@@ -112,7 +113,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 		password := argv[1]
 
 		BadRequestMessage := "Bad Request: This submission already verified, submission file not found, or password incorrect"
-		fmt.Println(BadRequestMessage)
+		log.Println(BadRequestMessage)
 		mainFileName := "./submissions/edit." + id + ".unverified"
 		mainFileNameIfAccepted := "./submissions/edit." + id + ".verified"
 		PasswordFileName := "./submissions/edit." + id + ".password"
@@ -223,14 +224,14 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 				index := len(sanitizedInputStr.CompositionList) - 1
 				sanitizedInputStr.CompositionList[index].Incipit = value
 			default:
-				fmt.Println("unknown key", row["name"])
+				log.Println("unknown key", row["name"])
 				if false {
 					SendJSONErrorMessage(w, "400 Unknown key: "+row["name"])
 					return
 				}
 			}
 		}
-		fmt.Printf("%+v\n", sanitizedInputStr)
+		log.Printf("%+v\n", sanitizedInputStr)
 
 		/*
 			Marshall sanitizedInputStr to a new tempfile in /submissions/
@@ -238,7 +239,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 
 		file, err := CreateTemp("./submissions", "submission.*.unverified")
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Println(err.Error())
 			SendJSONInternalErrorMessage(w, "500 Internal server error: "+err.Error())
 			return
 		}
@@ -249,13 +250,13 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 
 		marshaled, err := json.Marshal(sanitizedInputStr)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Println(err.Error())
 			SendJSONInternalErrorMessage(w, "500 Internal server error: "+err.Error())
 			return
 		}
 
 		if _, err = file.Write(marshaled); err != nil {
-			fmt.Println(err.Error())
+			log.Println(err.Error())
 			SendJSONInternalErrorMessage(w, "500 Internal server error: "+err.Error())
 			return
 		}
@@ -263,11 +264,11 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 		// Generate a random sequence of bytes to be send for the email verification
 
 		verifyPassword := randstr.Hex(16)
-		fmt.Println("password", (verifyPassword))
+		log.Println("password", (verifyPassword))
 		passwordFilename := fileNoEnding + ".password"
 		err = os.WriteFile(passwordFilename, []byte(verifyPassword), 0666)
 		if err != nil {
-			fmt.Println("password file error", err.Error())
+			log.Println("password file error", err.Error())
 			SendJSONInternalErrorMessage(w, "500 Internal server error (password file): "+err.Error())
 			return
 		}
@@ -291,13 +292,13 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		id := argv[0]
-		fmt.Println("id", id)
+		log.Println("id", id)
 
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			SendJSONErrorMessage(w, "Error while reading POST body")
 		}
-		fmt.Println(string(body))
+		log.Println(string(body))
 
 		bodyUnm := new([]map[string]string)
 		err = json.Unmarshal(body, bodyUnm)
@@ -419,7 +420,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 			} // end of switch state
 		}
 
-		fmt.Printf("%+v\n", eug)
+		log.Printf("%+v\n", eug)
 
 		/*
 			Marshal the [][]string eug.CompositionList into
@@ -459,13 +460,13 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 
 		originalSubmissionCSVFilename := "./current/" + eug.ID + ".csv"
 		newSubmissionCSVFilename := tmpFileNewSub.Name()
-		fmt.Println(originalSubmissionCSVFilename, newSubmissionCSVFilename)
+		log.Println(originalSubmissionCSVFilename, newSubmissionCSVFilename)
 
 		// compute the diff between these two files
 
 		cmd := APIV1EditUglyGetDiff(originalSubmissionCSVFilename, newSubmissionCSVFilename)
 		output, _ := cmd.CombinedOutput()
-		fmt.Println(string(output))
+		log.Println(string(output))
 
 		/*
 			// note, diff seems to exit code 1 when showing the diff
@@ -490,7 +491,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 
 		file, err := CreateTemp("./submissions", "edit.*.unverified")
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Println(err.Error())
 			SendJSONInternalErrorMessage(w, "500 Internal server error: "+err.Error())
 			return
 		}
@@ -501,7 +502,7 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 			SendJSONInternalErrorMessage(w, "500 Internal server error: "+err.Error())
 			return
 		}
-		fmt.Println(string(b))
+		log.Println(string(b))
 
 		_, err = file.Write(b)
 		if err != nil {
@@ -513,11 +514,11 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 		fileNoEnding := strings.TrimRight(file.Name(), ".unverified")
 		fileIndex := strings.TrimLeft(fileNoEnding, "./submissions/edit.")
 		verifyPassword := randstr.Hex(16)
-		fmt.Println("password", (verifyPassword))
+		log.Println("password", (verifyPassword))
 		passwordFilename := fileNoEnding + ".password"
 		err = os.WriteFile(passwordFilename, []byte(verifyPassword), 0666)
 		if err != nil {
-			fmt.Println("password file error", err.Error())
+			log.Println("password file error", err.Error())
 			SendJSONInternalErrorMessage(w, "500 Internal server error (password file): "+err.Error())
 			return
 		}

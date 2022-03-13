@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
-	"fmt"
+	"log"
 	"os"
 )
 
@@ -88,7 +88,7 @@ func ParseCurrentSingle(id string) (*CurrentSingle, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(CSVList)
+	log.Println(CSVList)
 
 	/*
 		Parse CSV list into []WVEntry
@@ -101,7 +101,7 @@ func ParseCurrentSingle(id string) (*CurrentSingle, error) {
 			return nil, errors.New("CSV: row with invalid length found")
 		}
 
-		fmt.Println(row)
+		log.Println(row)
 		var newEntry WVEntry
 		newEntry.Classifier = row[0]
 		newEntry.Number = row[1]
@@ -142,7 +142,7 @@ func ParseCurrentSingle(id string) (*CurrentSingle, error) {
 
 	ComposerInfo.Notes = allNotes
 
-	fmt.Println(fileNotes, ComposerInfo)
+	log.Println(fileNotes, ComposerInfo)
 
 	/*
 		Add up down insert and delete chars for the edit page
