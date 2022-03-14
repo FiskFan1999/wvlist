@@ -5,6 +5,6 @@
 tagline=##f
 }
 
-\score { { \omit Staff.TimeSignature \magnifyStaff #6/10
+\score { { \omit Staff.TimeSignature 
 {{ .Score }}
 }}

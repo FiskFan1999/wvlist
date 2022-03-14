@@ -28,7 +28,7 @@ type LilypondTemplateInput struct {
 func GetLilypondExec(in, out, dir string) (*exec.Cmd, context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(context.Background(), FullConfig.LilyTimeStr)
 	//defer cancel()
-	cmd := exec.CommandContext(ctx, FullConfig.LilypondPath, "-dbackend=eps", "-dsafe", "--png", "-o", out, in)
+	cmd := exec.CommandContext(ctx, FullConfig.LilypondPath, "-dbackend=eps", "-dsafe", "-dresolution=57", "--png", "-o", out, in)
 	cmd.Dir = dir
 	return cmd, cancel
 }
