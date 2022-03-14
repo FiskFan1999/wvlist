@@ -39,9 +39,9 @@
                 </tr>
                 {{ range .WVList }}
                 <tr>
-                    <td>{{.Classifier}}</td>
-                    <td style="text-align:right;">{{.Number}}</td>
-                    <td>{{.Title}}</td>
+                    <td style="font-family:monospace;">{{.Classifier}}</td>
+                    <td style="font-family:monospace;text-align:right;">{{.Number}}</td>
+                    <td style="font-family:monospace;">{{.Title}}</td>
                     <td>{{if .Incipit }}<img src="/incipit?id={{.ID}}&no={{.RowNumber}}" alt="{{.Incipit}}">{{ end}}</td>
                 </tr>
                 {{ end }}
