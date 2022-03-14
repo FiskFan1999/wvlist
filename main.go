@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -51,7 +50,7 @@ func main() {
 		creation of these directories.
 	*/
 	if err := CheckForNeededDirs(); err != nil {
-		fmt.Println("ERROR while checking for required directories:", err.Error())
+		log.Println("ERROR while checking for required directories:", err.Error())
 		os.Exit(1)
 	}
 
@@ -60,11 +59,11 @@ func main() {
 	*/
 	LilypondVer, err := CheckForLilypondAtStart()
 	if err != nil {
-		fmt.Print("---------------\nERROR while initializing: lilypond error:\n")
-		fmt.Println(err.Error())
-		fmt.Print("The incipits and lilypond sandbox will NOT work properly.\n---------------\n")
+		log.Print("---------------\nERROR while initializing: lilypond error:\n")
+		log.Println(err.Error())
+		log.Print("The incipits and lilypond sandbox will NOT work properly.\n---------------\n")
 	} else {
-		fmt.Printf("%s", LilypondVer)
+		log.Printf("%s", LilypondVer)
 	}
 
 	argv := flag.Args()
@@ -76,13 +75,13 @@ func main() {
 	switch argv[0] {
 	case "sendemail":
 		if len(argv) != 2 {
-			fmt.Println("./wvlist sendemail <to>")
+			log.Println("./wvlist sendemail <to>")
 			return
 		}
 		to := argv[1]
-		fmt.Println("Sending email to " + to)
+		log.Println("Sending email to " + to)
 		buf := SendTestSMTPEmail(to)
-		fmt.Println(buf.String())
+		log.Println(buf.String())
 
 	case "run":
 		/*
@@ -128,7 +127,7 @@ func main() {
 			MakePasswordHashCommand("")
 		}
 	default:
-		fmt.Println(`./wvlist run
+		log.Println(`./wvlist run
 ./wvlist sendemail <to>
 ./wvlist password [password]`)
 	}
