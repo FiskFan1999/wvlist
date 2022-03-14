@@ -6,13 +6,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/jordan-wright/email"
 	"html/template"
+	"log"
 	"net/smtp"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jordan-wright/email"
 )
 
 func SendSMTPEmail(too []string, subject string, html []byte, attachments ...string) (buf *bytes.Buffer, err error) {
@@ -75,7 +77,7 @@ func CheckEmailCooldownUnsubscribe(a string) bool {
 		EmailCoolDown[addr] = time.Now()
 		return true
 	} else {
-		fmt.Println("smtp: can't send email to", a, "due to cooldown")
+		log.Println("smtp: can't send email to", a, "due to cooldown")
 		return false
 	}
 
@@ -100,9 +102,9 @@ func SendTestSMTPEmail(to string) *bytes.Buffer {
 		em.Text = []byte("Hello. This is a test email, sent via ./wvlist smtp. If this email is recieved, that means your SMTP settings are entered correctly.")
 		err := em.SendWithStartTLS(FullConfig.SmtpDestination+":"+strconv.Itoa(FullConfig.SmtpPort), smtp.PlainAuth("", FullConfig.SmtpUsername, FullConfig.SmtpPassword, FullConfig.SmtpDestination), &tls.Config{ServerName: FullConfig.SmtpDestination})
 		if err != nil {
-			fmt.Println("smtp error:", err.Error())
+			log.Println("smtp error:", err.Error())
 		} else {
-			fmt.Println("email.SendWithStartTLS completed with no errors")
+			log.Println("email.SendWithStartTLS completed with no errors")
 		}
 	*/
 }
@@ -143,7 +145,7 @@ func Apiv1SentSmtpEmailForEditUgly(name, email, id, password string, info V1Uplo
 	tmpFileDiff.Close()
 	defer os.Remove(tmpFileDiff.Name())
 
-	fmt.Println("Sending email to", name, "at", email)
+	log.Println("Sending email to", name, "at", email)
 	var san Apiv1SentSmtpEmailForEditUglyStr
 	san.Config = *FullConfig
 	san.Name = name
@@ -201,12 +203,12 @@ func Apiv1SendSmtpEmailForSubmitUgly(san V1UploadUglySanitizedInput, fileIndex s
 
 	name := san.SubmitName
 	emailAddress := san.SubmitEmail
-	fmt.Println("sending email to", emailAddress)
-	fmt.Println("name", name)
+	log.Println("sending email to", emailAddress)
+	log.Println("name", name)
 
 	htmlTemplate, err := template.ParseFiles("template/apiv1submissionemail.html")
 	if err != nil {
-		fmt.Println("htmlTemplate for email error", err.Error())
+		log.Println("htmlTemplate for email error", err.Error())
 		return errors.New("Internal SMTP server error.")
 	}
 	var a Apiv1SendSmtpEmailForSubmitUglyStr

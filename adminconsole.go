@@ -15,14 +15,16 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
-	"golang.org/x/term"
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/term"
 )
 
 const (
@@ -626,7 +628,7 @@ func AdminAcceptEdit(argv []string) string {
 	if err != nil {
 		return "parse notes file error: " + err.Error()
 	}
-	fmt.Println(notesList)
+	log.Println(notesList)
 
 	newRow := make([]string, 3)
 	/*
@@ -829,7 +831,7 @@ func AdminConsole(w http.ResponseWriter, r *http.Request) {
 
 		out.Command = commandr[0]
 		out.Output = ExecuteAdminCommand(out.Command)
-		fmt.Println(out.Command)
+		log.Println(out.Command)
 	}
 
 	htmlTemplate.Execute(w, out)
@@ -885,43 +887,43 @@ func MakePasswordHashCommand(password string) {
 		passwd1 = []byte(password)
 		passwd2 = []byte(password)
 	} else {
-		fmt.Printf("Password: ")
+		log.Printf("Password: ")
 		passwd1, err := term.ReadPassword(int(os.Stdin.Fd()))
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Println(err.Error())
 			return
 		}
 
-		fmt.Printf("\nRe-enter: ")
+		log.Printf("\nRe-enter: ")
 		passwd2, err := term.ReadPassword(int(os.Stdin.Fd()))
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Println(err.Error())
 			return
 		}
-		fmt.Println()
+		log.Println()
 		if len(passwd1) == 0 || len(passwd2) == 0 {
-			fmt.Println("ERROR: password may not be empty.")
+			log.Println("ERROR: password may not be empty.")
 			MakePasswordHashCommand("") // re run
 		}
 	}
 
 	if string(passwd1) != string(passwd2) {
-		fmt.Println("ERROR: you did not enter the same password.")
+		log.Println("ERROR: you did not enter the same password.")
 		MakePasswordHashCommand("") // re run
 	}
 
 	hash, err := bcrypt.GenerateFromPassword(passwd1, BCRYPTCOST)
 	if err != nil {
-		fmt.Println("BCRYPT ERROR:", err.Error())
+		log.Println("BCRYPT ERROR:", err.Error())
 		return
 	}
 	if len(password) == 0 {
-		fmt.Println("\n\nhash: (enter the following has in the \"password\" field of the admin table in config.json)")
-		fmt.Println()
+		log.Println("\n\nhash: (enter the following has in the \"password\" field of the admin table in config.json)")
+		log.Println()
 	}
-	fmt.Println(string(hash))
+	log.Println(string(hash))
 	if len(password) == 0 {
-		fmt.Println()
+		log.Println()
 	}
 }
 

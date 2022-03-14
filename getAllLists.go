@@ -8,11 +8,12 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/gosimple/unidecode"
+	"log"
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/gosimple/unidecode"
 )
 
 type FullListIndex struct {
@@ -24,7 +25,7 @@ func GetAllLists() (FullIndexList []FullListIndex) {
 
 	dir, err := os.ReadDir("current")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 

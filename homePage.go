@@ -3,12 +3,13 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
-	"fmt"
-	"github.com/gosimple/unidecode"
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/gosimple/unidecode"
 )
 
 type HomepageMenuContentSingle struct {
@@ -60,7 +61,7 @@ func HomePage(isTLS bool) func(w http.ResponseWriter, r *http.Request) {
 		if len(searchQueryTermList) != 0 && len(searchQueryTermList[0]) != 0 {
 			searchQueryTerm := searchQueryTermList[0]
 			inp.SearchTerm = searchQueryTerm
-			fmt.Println("searching", searchQueryTerm)
+			log.Println("searching", searchQueryTerm)
 			inp.List = GetResultsSearchComposerIndex(inp.List[:], searchQueryTerm)
 		}
 
@@ -78,7 +79,7 @@ func GetHomePageMenuContents() (menu []HomepageMenuContentSingle) {
 	filename := "homepageMenuContents.csv"
 	file, err := os.ReadFile(filename)
 	if err != nil {
-		fmt.Println("Error reading"+filename, err)
+		log.Println("Error reading"+filename, err)
 		return
 	}
 
@@ -87,7 +88,7 @@ func GetHomePageMenuContents() (menu []HomepageMenuContentSingle) {
 	contentsCSV, err := csv.NewReader(breader).ReadAll()
 
 	if err != nil {
-		fmt.Println("Error reading csv from ", filename)
+		log.Println("Error reading csv from ", filename)
 		return
 	}
 
