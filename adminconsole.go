@@ -776,8 +776,8 @@ func AdminRejectEdit(argv []string) string {
 
 	}
 
-	editFilenameSplit := strings.Split(filename, ".")
-	newEditFileName := strings.Join(editFilenameSplit[0:len(editFilenameSplit)-1], ".") + ".rejected"
+	OFNS := strings.Split(filename, ".")
+	newEditFileName := strings.Join(OFNS[0:len(OFNS)-1], ".") + ".rejected"
 
 	newFile, err := os.Create(newEditFileName)
 	if err != nil {
@@ -786,6 +786,13 @@ func AdminRejectEdit(argv []string) string {
 
 	if _, err = newFile.Write(remarshal); err != nil {
 		return "new edit file write error: " + err.Error()
+	}
+
+	// also remove password file
+
+	passwordFileName := strings.Join(OFNS[0:len(OFNS)-1], ".") + ".password"
+	if err = os.Remove(passwordFileName); err != nil {
+		return err.Error()
 	}
 
 	newFile.Close()
