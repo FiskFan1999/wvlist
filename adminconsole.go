@@ -39,6 +39,7 @@ vedit <id> - View an edit
 asub <id> - Accept a submission
 aedit <id> - Accept an edit
 rsub <id> - Reject a submission
+redit <id> - Reject an edit
 testemail <address> - Send an email to test SMTP settings
 deletelily - Delete all lilypond files, to be re-rendered.
 help - list all available commands`
@@ -467,6 +468,8 @@ func ExecuteAdminCommand(command string) string {
 		return AdminAcceptEdit(argv)
 	case "rsub":
 		return AdminRejectSubmission(argv)
+	case "redit":
+		return AdminRejectEdit(argv)
 	case "testemail":
 		return AdminTestEmail(argv)
 	case "deletelily":
@@ -723,6 +726,73 @@ func AdminViewEdit(argv []string) string {
 	fmt.Fprintf(buf, "\n%s\n", sub.Diff)
 
 	return buf.String()
+}
+
+func AdminRejectEdit(argv []string) string {
+	if len(argv) != 2 {
+		return "redit <id>"
+	}
+
+	id := argv[1]
+	submissionp, errorMessage := AdminGetEditFromSnippet(id)
+	if errorMessage != "" {
+		return errorMessage
+	}
+
+	submission := *submissionp
+
+	/*
+		Rewrite .verified or .unverified file to .rejected (remove email)
+	*/
+
+	filename := SubmissionsDirPath + submission.Name()
+	origContents, err := os.ReadFile(filename)
+	if err != nil {
+		return err.Error()
+	}
+
+	/*
+		Unmarshal contents into the struct
+	*/
+
+	var sub V1UploadEditUglyBodyOutput
+
+	err = json.Unmarshal(origContents, &sub)
+	if err != nil {
+		return "submission json parsing error: " + err.Error()
+	}
+
+	/*
+		Change the filename of the edit
+		submission to accepted.
+	*/
+
+	sub.SubmitEmail = "" // erase email
+
+	var remarshal []byte
+	remarshal, err = json.MarshalIndent(sub, "", "  ")
+	if err != nil {
+		return "remarshal error: " + err.Error()
+
+	}
+
+	editFilenameSplit := strings.Split(filename, ".")
+	newEditFileName := strings.Join(editFilenameSplit[0:len(editFilenameSplit)-1], ".") + ".rejected"
+
+	newFile, err := os.Create(newEditFileName)
+	if err != nil {
+		return "new edit file create error: " + err.Error()
+	}
+
+	if _, err = newFile.Write(remarshal); err != nil {
+		return "new edit file write error: " + err.Error()
+	}
+
+	newFile.Close()
+	if err = os.Remove(filename); err != nil {
+		return "error removing previous edit submission file: " + err.Error()
+	}
+	return "Edit submission rejected."
 }
 
 func AdminRejectSubmission(argv []string) string {
