@@ -38,7 +38,7 @@
             <table id="tablej">
                 <tr>
                     <th>
-                        <abbr title="Title of classification. For example, Opus, BWV, K, etc.">Class.</abbr>
+                        <abbr title="Title of catelogue of compositions. For example, Opus, BWV, K, etc.">C</abbr>
                     </th>
                     <th>
                         No.
@@ -52,9 +52,9 @@
                 </tr>
                 {{ range .WVList }}
                 <tr>
-                    <td style="font-family:monospace;">{{.Classifier}}</td>
-                    <td style="font-family:monospace;text-align:right;">{{.Number}}</td>
-                    <td style="font-family:monospace;">{{.Title}}</td>
+                    <td >{{.Classifier}}</td>
+                    <td style="text-align:right;">{{.Number}}</td>
+                    <td >{{.Title}}</td>
                     <td>{{if .Incipit }}<img src="/incipit?id={{.ID}}&no={{.RowNumber}}" alt="{{.Incipit}}">{{ end}}</td>
                 </tr>
                 {{ end }}

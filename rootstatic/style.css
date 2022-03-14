@@ -37,4 +37,9 @@ table {
 td {
     border: solid black 1px;
     padding: 0.2em;
+    font-family: monospace;
+}
+
+th {
+    font-family: monospace;
 }
