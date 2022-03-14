@@ -10,9 +10,12 @@
 !template/*
 !rootstatic
 !rootstatic/style.css
+!rootstatic/logo/*
 !lilypond_template
 !homepageMenuContents.csv
 !go.sum
 !Makefile
 !rootstatic/lilypondexamples/
 !rootstatic/lilypondexamples/*
+!logo
+!logo/*
