@@ -20,9 +20,8 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
     # Runs a single command using the runners shell
-    - name: Install npm
-      run: sudo apt install npm -y
       
     - name: html
       # https://github.com/htmlhint/HTMLHint
