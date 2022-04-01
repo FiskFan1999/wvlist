@@ -915,6 +915,10 @@ func AdminConsole(w http.ResponseWriter, r *http.Request) {
 }
 
 func AdminConsoleCheckAuth(w http.ResponseWriter, r *http.Request) bool {
+	/*
+		Returns true of auth succeeds
+	*/
+
 	u, p, ok := r.BasicAuth()
 
 	if !ok {

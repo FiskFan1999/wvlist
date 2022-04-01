@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+while [[ 1 == 1 ]]
+do
+    read -p "Command - " WVLISTCOMM
+    
+    if [[ "$WVLISTCOMM" == "quit" ]]
+    then
+        exit 0
+
+    elif [[ "$WVLISTCOMM" != "" ]]
+    then
+        curl --user "$WVLISTUNAME:$WVLISTPASS" -G "${WVLISTHOST/%\/}/api/v1/admin" --data-urlencode "command=$WVLISTCOMM"
+    fi
+done
