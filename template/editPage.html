@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <title>Create edit submission</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="/style.css">
         <link rel="icon" href="/logo/favicon-32.png" sizes="32x32">
@@ -15,7 +16,7 @@
         <link rel="apple-touch-icon" href="/logo/favicon-180.png" sizes="180x180">
         <meta name="msapplication-TileColor" content="#FFFFFF">
         <meta name="msapplication-TileImage" content="/logo/favicon-144.png">
-        <meta name="msapplication-config" content="/logo/browserconfig.xml" />
+        <meta name="msapplication-config" content="/logo/browserconfig.xml">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
     <body>
@@ -26,7 +27,7 @@
                     <textarea rows="3" cols="40" name="notes" placeholder="Notes about composer, information about sources, etc." id="notes"></textarea>
                     <h4>Author of Submission</h4>
                     <label for="submitname">Submitter's name</label>
-                    <input type="text" size=30 name="submitname" placeholder="Leave blank for anonymous" id="submitname">
+                    <input type="text" size="30" name="submitname" placeholder="Leave blank for anonymous" id="submitname">
                     <br><label for="email">Verification Email</label>
                     <input type="email" placeholder="optional" name="email" id="email">
                     <p><span style="font-style:italic;">Note about email: </span>Your email will be used to send a verification link, and it will be saved while I verify your submission, and when it has been accepted your email address will be discarded.</p>
@@ -53,16 +54,16 @@
                 {{ range .WVList }}
                     <tr>
                         <td>
-                            <input value="{{ .Classifier }}" size=10 type="text" name="classification" id="classification">
+                            <input value="{{ .Classifier }}" size="10" type="text" name="classification" id="classification">
                         </td>
                         <td>
-                            <input value="{{ .Number }}" size=5 type="text" name="number" id="number">
+                            <input value="{{ .Number }}" size="5" type="text" name="number" id="number">
                         </td>
                         <td>
-                            <input value="{{ .Title }}" size=30 type="text" name="title" id="title">
+                            <input value="{{ .Title }}" size="30" type="text" name="title" id="title">
                         </td>
                         <td>
-                            <input value="{{ .Incipit }}" size=20 type="text" name="incipit" id="incipit">
+                            <input value="{{ .Incipit }}" size="20" type="text" name="incipit" id="incipit">
                         </td>
                         <td>
                             <input type="button" value="{{$.Down }}" onclick="moveRowDown(this)">
@@ -79,7 +80,7 @@
                     </tr>
                 {{ end }}
                 </table>
-                <input type=button value="Add more rows{{ if ne .Rows 1 }} x{{ .Rows}}{{ end}}" onclick="addRows()">
+                <input type="button" value="Add more rows{{ if ne .Rows 1 }} x{{ .Rows}}{{ end}}" onclick="addRows()">
                 <input type="button" value="Submit" onclick="makeSubmission()">
 
             </form>

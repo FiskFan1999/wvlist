@@ -10,3 +10,5 @@ clean:
 	rm -f ./wvlist
 debug:
 	./wvlist -d -t 7070 -p 6060 run
+lint:
+	npx htmlhint -r "tagname-lowercase,attr-lowercase,attr-value-double-quotes,doctype-first,doctype-html5,tag-pair,spec-char-escape,id-unique,src-not-empty,attr-no-duplication,title-require,attr-unsafe-chars,html-lang-require,id-unique,tag-pair,tagname-lowercase,tagname-specialchars,attr-no-unnecessary-whitespace,empty-tag-not-self-closed"
