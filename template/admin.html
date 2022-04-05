@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <title>
+            Administrator Control Panel
+        </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="/style.css">
         <link rel="icon" href="/logo/favicon-32.png" sizes="32x32">
@@ -15,13 +18,13 @@
         <link rel="apple-touch-icon" href="/logo/favicon-180.png" sizes="180x180">
         <meta name="msapplication-TileColor" content="#FFFFFF">
         <meta name="msapplication-TileImage" content="/logo/favicon-144.png">
-        <meta name="msapplication-config" content="/logo/browserconfig.xml" />
+        <meta name="msapplication-config" content="/logo/browserconfig.xml">
     </head>
     <body>
         <div>
             <a href="/">Go home</a>
             <form method="get">
-                <input size=60 id="command" name="command" type="text">
+                <input size="60" id="command" name="command" type="text">
             </form>
             {{ if .Command }}
             <h2 style="margin:2px;font-family:monospace;">{{ .Command }}</h2>
