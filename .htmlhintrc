@@ -13,7 +13,6 @@
     "attr-unsafe-chars": true,
     "href-abs-or-rel": true,
     "html-lang-require": true,
-    "input-requires-label": true,
     "tagname-specialchars": true,
     "attr-no-unnecessary-whitespace": true,
     "empty-tag-not-self-closed": true
