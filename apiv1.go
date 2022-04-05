@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -63,6 +64,23 @@ func APIv1Handler(w http.ResponseWriter, r *http.Request) {
 	argv := argvraw[1:]
 
 	switch command {
+	case "admin":
+		/*
+			Run admin commands from API.
+			Uses basic auth
+		*/
+		if !AdminConsoleCheckAuth(w, r) {
+			return
+		}
+		var out AdminConsoleOutput
+		commandr := r.URL.Query()["command"]
+		if len(commandr) == 1 {
+
+			out.Command = commandr[0]
+			out.Output = ExecuteAdminCommand(out.Command)
+			log.Println(out.Command)
+		}
+		fmt.Fprintln(w, out.Output)
 	case "verify":
 		if len(argv) != 2 {
 			http.Error(w, "Bad request: usage /api/v1/verify/<id>/<password>", 400)
