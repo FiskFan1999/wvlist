@@ -22,4 +22,4 @@ Please feel free to join the conversation on IRC. (click to open browser client)
 
 Main networks:
 - [`irc.ergo.chat:6697 (TLS) #wvlist`](https://ergo.chat/kiwi/#wvlist)
-- [`irc.libera.chat#wvlist`](https://web.libera.chat/#wvlist)
+- [`irc.libera.chat#wvlist`](https://web.libera.chat/#wvlist) - Also available on Matrix at `#wvlist:libera.chat`
