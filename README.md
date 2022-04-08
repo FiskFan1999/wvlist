@@ -20,7 +20,8 @@ In addition to the modules imported by the Go compiler, this project requires th
 # Chat
 Please feel free to join the conversation on IRC.
 
-Main network:
+Main networks:
 - [`irc.ergo.chat:6697 (TLS) #wvlist`](https://ergo.chat/kiwi/#wvlist)
+- `irc.libera.chat#wvlist`
 
 (Click to open web-browser client which can be found at https://ergo.chat/kiwi/#wvlist)
