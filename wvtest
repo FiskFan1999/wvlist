@@ -1,0 +1,45 @@
+#!/usr/bin/env bash -x
+
+# wvtest
+# Executes all tests and linters
+# to replace functionality of
+# shared runners
+
+exitCode=0
+
+# go build test
+binfile=$(mktemp)
+go build -v -o "$binfile"
+
+if [[ "$?" != 0 ]]
+then
+    exitCode=$(($exitCode + 1))
+fi
+
+rm -f "$binfile"
+
+# go test
+go test ./...
+
+if [[ "$?" != 0 ]]
+then
+    exitCode=$(($exitCode + 1))
+fi
+
+# go vet
+go vet ./...
+
+if [[ "$?" != 0 ]]
+then
+    exitCode=$(($exitCode + 1))
+fi
+
+# html linter
+npx htmlhint
+
+if [[ "$?" != 0 ]]
+then
+    exitCode=$(($exitCode + 1))
+fi
+
+exit $exitCode
