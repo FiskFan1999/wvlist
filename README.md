@@ -1,3 +1,12 @@
+Note: since v1.2.0, wvlist has moved to Codeberg and will not be updated on Github anymore. To change the remote url, follow these steps:
+```bash
+cd wvlist
+git remote set-url origin https://codeberg.org/FiskFan1999/wvlist.git
+git pull
+git checkout master
+git branch -d main
+```
+
 # wvlist
 WVList is a Werke Verzeichnis database available over HTTP(s) with community submissions. It is being hosted by the creator at [wvlist.net](https://wvlist.net) [(onion service)](http://xtjuwqe4hlqojbknh2kwlm5nh4usj2yh5ceuh2x4gy27wirurxh3qoid.onion/), and can be hosted by anyone else as well. This project is intended to be a reference tool for the catalogue complete works list of composers and the numbering list used to identify each composition of a composer, even when ambiguous titles are used. Well-known examples of WV catalogues are [Bach Werke Verzeichnis](https://www.bach-cantatas.com/Bach-Werke-Verzeichnis.pdf), [K numbers used to classify Mozart compositions](https://www.mozartproject.org/what-are-mozart-k-numbers/), and using Opus numbers to classify published compositions.
 
