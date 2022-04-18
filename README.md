@@ -1,4 +1,4 @@
-Note: since v1.2.0, wvlist has moved to Codeberg and will not be updated on Github anymore. To change the remote url, follow these steps:
+Note: since v1.2.0, wvlist has moved to [Codeberg](https://codeberg.org/FiskFan1999/wvlist) and will not be updated on Github anymore. To change the remote url, follow these steps:
 ```bash
 cd wvlist
 git remote set-url origin https://codeberg.org/FiskFan1999/wvlist.git
